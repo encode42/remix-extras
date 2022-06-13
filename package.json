@@ -1,7 +1,7 @@
 {
   "name": "@encode42/remix-extras",
   "description": "Extra components and functionality for Remix.",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "author": {
     "name": "Encode42",
     "email": "me@encode42.dev",
