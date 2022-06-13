@@ -1,0 +1,37 @@
+{
+    "compilerOptions": {
+        "outDir": "build",
+        "target": "ES2021",
+        "lib": ["DOM", "ES2021"],
+        "moduleResolution": "Node",
+        "esModuleInterop": true,
+        "isolatedModules": true,
+        "allowJs": true,
+        "declaration": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "listFiles": true,
+        "jsx": "react-jsx"
+    },
+    "typedocOptions": {
+        "entryPoints": ["src/index.ts"],
+        "out": "docs",
+        "githubPages": false,
+        "validation": {
+            "invalidLink": true
+        },
+        "readme": "none",
+        "name": "mantine-extras",
+        "includeVersion": true,
+        "sort": ["static-first", "visibility"]
+    },
+    "include": [
+        "**/*.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "build",
+        "dist",
+        "docs"
+    ]
+}
