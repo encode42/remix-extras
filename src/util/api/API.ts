@@ -1,12 +1,22 @@
-import { Params } from "react-router";
-import { Request, Response } from "@remix-run/node";
+import { redirect, Request, Response } from "@remix-run/node";
+import { leadingSlash } from "../leadingSlash";
 
+/**
+ * Parameters for the {@link EndpointCallback} function arguments.
+ */
 export interface EndpointParams {
-    "params": Params,
+    "param": string,
     "request": Request
 }
 
-export type EndpointCallback<T> = ({ params, request }: EndpointParams) => T;
+/**
+ * Callback function of endpoints.
+ */
+export type EndpointCallback<T> = ({ param, request }: EndpointParams) => T;
+
+/**
+ * Types of available endpoint types.
+ */
 export type EndpointType = "action" | "loader" | "default";
 
 /**
@@ -16,7 +26,7 @@ export interface APIProps {
     /**
      * URL of the website.
      *
-     * Defaults to {@code process.env.WEBSITE_URL} or {@code https://localhost:3000}.
+     * Defaults to {@code process.env.WEBSITE_URL}.
      */
     "websiteURL"?: string,
 
@@ -33,21 +43,57 @@ export interface APIProps {
     "endpointFormat"?: string
 }
 
+/**
+ * Options for the {@link registerOptions} function.
+ */
 export interface registerOptions<T> {
+    /**
+     * Route to register.
+     */
     "route": string,
+
+    /**
+     * Type of endpoint to register.
+     */
     "type": EndpointType,
+
+    /**
+     * Callback to execute on load.
+     */
     callback: EndpointCallback<T>
 }
 
+/**
+ * Options for the {@link handleOptions} function.
+ */
 export interface handleOptions {
+    /**
+     * Route to handle.
+     */
     "route"?: string,
+
+    /**
+     * Type of endpoint.
+     */
     "type": EndpointType,
-    "request"?: Request,
-    "params"?: Params
+
+    /**
+     * Requesting client.
+     */
+    "request"?: Request
 }
 
-export type EndpointActions<T> = {
+/**
+ * The routes an endpoint can use.
+ */
+export type EndpointRoutes<T> = {
+    /**
+     * {@link EndpointType} that's registered.
+     */
     [key in EndpointType]: {
+        /**
+         * Callback to execute on load.
+         */
         "callback": EndpointCallback<T>
     }
 }
@@ -55,36 +101,126 @@ export type EndpointActions<T> = {
 /**
  * An API convenience class.
  *
- * Routes are expected to be stored in {@code ${websiteURL}/api/v${apiVersion}/} by default.
+ * Routes are expected to be stored in {@code api/v${apiVersion}/} by default.
+ *
+ * The {@link register} and {@link handle} functions require a proper splat setup.
+ * @example Recommended API and splat setup
+ * ***
+ * This file creates an API instance that persists between changes and page refreshes.
+ *
+ * > `app/util/api.server.ts`
+ * ```js
+ * import { API } from "@encode42/remix-extras";
+ *
+ * let api: API;
+ *
+ * declare global {
+ *     var __api: API | undefined;
+ * }
+ *
+ * if (process.env.NODE_ENV === "production") {
+ *     api = new API({});
+ * } else {
+ *     if (!global.__api) {
+ *         global.__api = new API({});
+ *     }
+ *
+ *     api = global.__api;
+ * }
+ *
+ * export { api };
+ * ```
+ * ***
+ * This is the splat that handles all {@link register}ed routes and endpoints.
+ *
+ * Without this, {@link handle} wouldn't be called, and endpoints would be ignored.
+ *
+ * > `app/routes/api/v1/$.ts`
+ * ```js
+ * import { RouteOptions } from "@encode42/remix-extras";
+ * import { api } from "~/util/api.server"; // Instantiated API instance
+ *
+ * // Handles all registered action endpoints
+ * export function action({ request, params }: RouteOptions) {
+ *     return api.handle({
+ *         "route": params["*"],
+ *         "type": "action",
+ *         request
+ *     });
+ * }
+ *
+ * // Handles all registered loader endpoints
+ * export function loader({ request, params }: RouteOptions) {
+ *     return api.handle({
+ *         "route": params["*"],
+ *         "type": "loader",
+ *         request
+ *     });
+ * }
+ * ```
  */
 export class API {
+    /**
+     * URL of the website.
+     */
     private readonly websiteURL: string;
+
+    /**
+     * Version of the API route.
+     */
     private readonly apiVersion: number;
+
+    /**
+     * Format for endpoints to refer to.
+     */
     private readonly endpointFormat: string;
 
-    private readonly endpoints = new Map<string, EndpointActions<unknown>>;
+    /**
+     * Map of registered endpoints.
+     *
+     * @see register
+     * @see handle
+     */
+    private readonly endpoints = new Map<string, EndpointRoutes<unknown>>;
 
-    constructor({ websiteURL = process.env.WEBSITE_URL ?? "https://localhost:3000", apiVersion = 1, endpointFormat }: APIProps) {
+    constructor({ websiteURL = process.env.WEBSITE_URL, apiVersion = 1, endpointFormat }: APIProps) {
         this.websiteURL = websiteURL;
         this.apiVersion = apiVersion;
 
-        this.endpointFormat = endpointFormat ?? `${websiteURL}/api/v${apiVersion}/`;
+        this.endpointFormat = endpointFormat ?? `api/v${apiVersion}/`;
+    }
+
+    getFormat(withName = false) {
+        if (withName && !this.websiteURL) {
+            throw new Error("The websiteURL argument or WEBSITE_URL environment variable must not be empty.");
+        }
+
+        return `${withName ? leadingSlash(this.websiteURL, false) : ""}/${this.endpointFormat}`;
     }
 
     /**
      * Format an array of paths into an API path.
      */
-    format(...paths) {
-        return `${this.endpointFormat}/${paths.join("/")}`;
+    format(withName, ...paths) {
+        return `${this.getFormat(withName)}${paths.join("/")}`;
     }
 
+    /**
+     * Register an API route.
+     *
+     * This relies on a proper {@link API} splat setup.
+     */
     register<T = Response>({ route, type, callback }: registerOptions<T>) {
+        const format = this.getFormat(false);
+
+        // Create a valid object from arguments
         let endpoint = {
             [type]: {
                 callback
             }
-        } as EndpointActions<T>;
+        } as EndpointRoutes<T>;
 
+        // Route already exists, so merge the types
         const existingRoute = this.endpoints.get(route);
         if (existingRoute) {
             endpoint = {
@@ -93,20 +229,35 @@ export class API {
             };
         }
 
-        this.endpoints.set(route, endpoint);
+        this.endpoints.set(route.replace(format, ""), endpoint);
     }
 
-    handle({ route, type, request, params }: handleOptions) {
+    /**
+     * Handles an API route.
+     *
+     * Redirects to the website's index if not found.
+     *
+     * This relies on a proper {@link API} splat setup.
+     */
+    handle({ route, type, request }: handleOptions) {
+        // Route does not exist
         if (!route) {
-            return null;
+            return redirect("/");
         }
 
+        // Route exists!
         const existingRoute = this.endpoints.get(route);
         const existingType = existingRoute?.[type];
+
+        // Route type does not exist
         if (!existingType) {
             return null;
         }
 
-        return existingType.callback({ params, request });
+        // Get the last param from the route
+        const splitURL = request.url.split("/");
+        const param = splitURL[splitURL.length - 1].replace(/\?.+/, "");
+
+        return existingType.callback({ param, request });
     }
 }

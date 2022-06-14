@@ -3,6 +3,9 @@ import { ErrorPage as MantineErrorPage, ErrorPageProps } from "@encode42/mantine
 import { Anchor } from "../Anchor";
 import { useNavigate } from "react-router";
 
+/**
+ * A generic error page with back button.
+ */
 export function ErrorPage({
     statusCode,
     title

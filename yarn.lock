@@ -493,10 +493,10 @@
   resolved "https://registry.yarnpkg.com/@emotion/weak-memoize/-/weak-memoize-0.2.5.tgz#8eed982e2ee6f7f4e44c253e12962980791efd46"
   integrity sha512-6U71C2Wp7r5XtFtQzYrW5iKFT67OixrSxjI4MptCHzdSVlgabczzqLe0ZSgnub/5Kp4hSbpDB1tMytZY9pwxxA==
 
-"@encode42/mantine-extras@^3.2.1":
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/@encode42/mantine-extras/-/mantine-extras-3.2.1.tgz#335817e5df21078026de5da51f066f2149879145"
-  integrity sha512-gIdeBZoSN7oxSmSrDNHEfFAuY6h6P0mtUcOwSU6pDfl6ItiXVyxt/gS67vS5ZtN2lSN3oaDt2GA+NLv0se0TwA==
+"@encode42/mantine-extras@^3.3.0":
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/@encode42/mantine-extras/-/mantine-extras-3.3.0.tgz#68cd49e07063049955d358204fa8a9ab6ea4b870"
+  integrity sha512-wRaJ7mEykI/tEbzQuzJ26iKf3zZvhsVbm7lyt1P3No9eVexeX8RNr8ptCU4PbkUIARWlDN8e/GhoKndB0rjWKw==
   dependencies:
     "@mantine/core" "^4.2.0"
     "@mantine/hooks" "^4.2.0"

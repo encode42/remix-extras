@@ -21,7 +21,7 @@
             "invalidLink": true
         },
         "readme": "none",
-        "name": "mantine-extras",
+        "name": "remix-extras",
         "includeVersion": true,
         "sort": ["static-first", "visibility"]
     },

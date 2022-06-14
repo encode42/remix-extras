@@ -1,8 +1,7 @@
-import { Authenticator } from "remix-auth";
-import { redirect, SessionStorage } from "@remix-run/node";
+import { AuthenticateOptions, Authenticator } from "remix-auth";
+import { redirect, Request, SessionStorage } from "@remix-run/node";
 import { storageBuilder, storageBuilderProps } from "./storageBuilder";
 import { authBuilder } from "./authBuilder";
-import { OAuth2Strategy } from "remix-auth-oauth2";
 import { API } from "../api";
 import { Class } from "@encode42/mantine-extras";
 import { Strategy } from "remix-auth/build/strategy";
@@ -54,10 +53,28 @@ export interface registerProps<T, User> {
     "options": Record<string, any>
 }
 
+/**
+ * Result of the {@link Auth.register} function.
+ */
 export interface registerResult {
+    /**
+     * Resulting routes.
+     */
     "route": {
+        /**
+         * Default provider route.
+         */
         "default": string,
-        "callback": string
+
+        /**
+         * Provider callback route.
+         */
+        "callback": string,
+
+        /**
+         * Full provider callback route including site name.
+         */
+        "fullCallback": string
     }
 }
 
@@ -65,10 +82,26 @@ export interface registerResult {
  * A class to handle user authentication.
  */
 export class Auth<User = unknown> {
+    /**
+     * {@link https://github.com/sergiodxa/remix-auth#usage= Authenticator} instance to utilize.
+     */
     private readonly authenticator: Authenticator<User>;
+
+    /**
+     * {@link https://remix.run/docs/en/v1/api/remix#createsessionstorage SessionStorage} instance to utilize.
+     *
+     * @see storageBuilder
+     */
     private readonly sessionStorage: SessionStorage;
+
+    /**
+     * {@link API} instance to utilize.
+     */
     private readonly api: API;
 
+    /**
+     * The route used to log a user out.
+     */
     public logoutRoute: string;
 
     constructor({ secret, api }: AuthProps) {
@@ -82,12 +115,12 @@ export class Auth<User = unknown> {
 
         this.api = api;
 
-        this.logoutRoute = this.api.format("auth", "logout");
+        this.logoutRoute = this.api.format(false, "auth", "logout");
         this.api.register({
             "route": this.logoutRoute,
             "type": "action",
-            "callback": ({ request }) => {
-                this.logout(request);
+            "callback": async ({ request }) => {
+                return await this.logout(request);
             }
         });
     }
@@ -95,59 +128,78 @@ export class Auth<User = unknown> {
     /**
      * Get the current account from a request.
      */
-    public async getAccount(request: Request, options?: getAccountOptions) {
-        options = {
-            "failureRedirect": false,
-            ...options
-        };
+    public async getAccount(request: Request) {
+        return await this.authenticator.isAuthenticated(request);
+    }
 
+    /**
+     * Get the current account from a request and redirect on failure.
+     */
+    public async requiredAccount(request: Request) {
         return await this.authenticator.isAuthenticated(request, {
-            "failureRedirect": options.failureRedirect ? "/" : undefined
+            "failureRedirect": "/login"
         });
     }
 
     /**
      * Register a new OAuth2 strategy.
+     *
+     * Automatically handles provider and callback routes!
+     * This relies on a proper {@link API} splat setup.
      */
     public register<T extends Strategy<User, never>>({ strategy, verify, provider, options }: registerProps<T, User>): registerResult {
-        const defaultURL = this.api.format("auth", `provider?p=${provider}`);
-        const callbackURL = this.api.format("auth", `callback?p=${provider}`);
+        const defaultURL = this.api.format(false, "auth", "provider", provider);
+        const callbackURL = this.api.format(false, "auth", "callback", provider);
 
+        const fullCallback = this.api.format(true, "auth", "callback", provider);
+
+        // Register the default provider loader route
         this.api.register({
             "route": defaultURL,
             "type": "loader",
             "callback": () => {
-                return redirect("/");
+                return redirect("/login");
             }
         });
 
+        // Register the default provider action route
         this.api.register<Promise<User>>({
             "route": defaultURL,
             "type": "action",
-            "callback": ({ request, params }) => {
-                return this.auth(request, params["p"]);
+            "callback": ({ request, param }) => {
+                return this.auth(request, param);
             }
         });
 
+        // Register the callback provider loader route
         this.api.register<Promise<User>>({
             "route": callbackURL,
             "type": "loader",
-            "callback": ({ request, params }) => {
-                return this.auth(request, params["p"]);
+            "callback": ({ request, param }) => {
+                return this.auth(request, param, {
+                    "successRedirect": "/",
+                    "failureRedirect": "/login"
+                });
             }
         });
 
+        // Register the authentication strategy
         this.authenticator.use(new strategy({
             ...options,
-            callbackURL
-        }, user => {
-            return verify?.(user);
+            "callbackURL": fullCallback
+        }, async user => {
+            if (!verify) {
+                return user;
+            }
+
+            return await verify?.(user);
         }));
 
         return {
             "route": {
                 "default": defaultURL,
-                "callback": callbackURL
+                "callback": callbackURL,
+                "fullCallback": fullCallback
             }
         };
     }
@@ -157,9 +209,10 @@ export class Auth<User = unknown> {
      *
      * @param request Request to authenticate
      * @param provider Registered provided to authenticate with
+     * @param options Authenticator options
      */
-    public async auth(request: Request, provider: string) {
-        return this.authenticator.authenticate(provider, request);
+    public async auth(request: Request, provider: string, options?: Pick<AuthenticateOptions, "successRedirect" | "failureRedirect" | "throwOnError" | "context">) {
+        return this.authenticator.authenticate(provider, request, options);
     }
 
     /**
