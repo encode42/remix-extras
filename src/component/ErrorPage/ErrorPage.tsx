@@ -1,17 +1,16 @@
 import React from "react";
-import { Error } from "@encode42/mantine-extras";
+import { ErrorPage as MantineErrorPage, ErrorPageProps } from "@encode42/mantine-extras";
 import { Anchor } from "../Anchor";
 import { useNavigate } from "react-router";
 
 export function ErrorPage({
     statusCode,
-    title,
-    links
-}) {
+    title
+}: ErrorPageProps) {
     const navigate = useNavigate();
 
     return (
-        <Error statusCode={statusCode} title={title} links={
+        <MantineErrorPage statusCode={statusCode} title={title} links={
             <>
                 <Anchor to="/">
                     Home
@@ -23,5 +22,5 @@ export function ErrorPage({
                 </Anchor>
             </>
         } />
-    )
+    );
 }

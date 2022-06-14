@@ -1,7 +1,7 @@
 {
   "name": "@encode42/remix-extras",
   "description": "Extra components and functionality for Remix.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": {
     "name": "Encode42",
     "email": "me@encode42.dev",
@@ -31,7 +31,7 @@
     "changelog.md"
   ],
   "dependencies": {
-    "@encode42/mantine-extras": "^3.1.0",
+    "@encode42/mantine-extras": "^3.2.1",
     "@mantine/core": "^4.2.0",
     "@mantine/hooks": "^4.2.0",
     "@mantine/notifications": "^4.2.0",

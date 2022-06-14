@@ -1,10 +1,11 @@
 import { Authenticator } from "remix-auth";
-import { SessionStorage } from "@remix-run/node";
+import { redirect, SessionStorage } from "@remix-run/node";
 import { storageBuilder, storageBuilderProps } from "./storageBuilder";
 import { authBuilder } from "./authBuilder";
 import { OAuth2Strategy } from "remix-auth-oauth2";
 import { API } from "../api";
 import { Class } from "@encode42/mantine-extras";
+import { Strategy } from "remix-auth/build/strategy";
 
 /**
  * Options for the {@link Auth} class.
@@ -23,33 +24,83 @@ export interface getAccountOptions {
     /**
      * Whether to redirect the user on authentication failure.
      */
-    "failureRedirect": boolean
+    "failureRedirect"?: boolean
+}
+
+/**
+ * Options for the {@link Auth.register} function.
+ */
+export interface registerProps<T, User> {
+    /**
+     * Class to authenticate with.
+     */
+    "strategy": Class<T>,
+
+    /**
+     * Provider this strategy uses.
+     */
+    "provider": string,
+
+    /**
+     * Function used to verify the authenticated account.
+     *
+     * @param user Resulting user.
+     */
+    "verify"?: (user: User) => any,
+
+    /**
+     * Additional options for the provider.
+     */
+    "options": Record<string, any>
+}
+
+export interface registerResult {
+    "route": {
+        "default": string,
+        "callback": string
+    }
 }
 
 /**
  * A class to handle user authentication.
  */
-export class Auth<T = void> {
-    private readonly authenticator: Authenticator;
+export class Auth<User = unknown> {
+    private readonly authenticator: Authenticator<User>;
     private readonly sessionStorage: SessionStorage;
     private readonly api: API;
+
+    public logoutRoute: string;
 
     constructor({ secret, api }: AuthProps) {
         this.sessionStorage = storageBuilder({
             "secret": secret
         });
 
-        this.authenticator = authBuilder<T>({
+        this.authenticator = authBuilder<User>({
             "sessionStorage": this.sessionStorage
         });
 
         this.api = api;
+
+        this.logoutRoute = this.api.format("auth", "logout");
+        this.api.register({
+            "route": this.logoutRoute,
+            "type": "action",
+            "callback": ({ request }) => {
+                this.logout(request);
+            }
+        });
     }
 
     /**
      * Get the current account from a request.
      */
-    public async getAccount(request: Request, options: getAccountOptions) {
+    public async getAccount(request: Request, options?: getAccountOptions) {
+        options = {
+            "failureRedirect": false,
+            ...options
+        };
+
         return await this.authenticator.isAuthenticated(request, {
             "failureRedirect": options.failureRedirect ? "/" : undefined
         });
@@ -57,18 +108,48 @@ export class Auth<T = void> {
 
     /**
      * Register a new OAuth2 strategy.
-     *
-     * @param strategy Class to authenticate with
-     * @param verify Function used to register the user
-     * @param provider Provider this strategy uses
-     * @example {@code SocialsProvider.GITHUB}
-     * @param options Additional options for the provider
      */
-    public use<S extends OAuth2Strategy<T, any>>(strategy: Class<S>, verify: (T) => any, provider: string, options: Record<string, any>) {
+    public register<T extends Strategy<User, never>>({ strategy, verify, provider, options }: registerProps<T, User>): registerResult {
+        const defaultURL = this.api.format("auth", `provider?p=${provider}`);
+        const callbackURL = this.api.format("auth", `callback?p=${provider}`);
+
+        this.api.register({
+            "route": defaultURL,
+            "type": "loader",
+            "callback": () => {
+                return redirect("/");
+            }
+        });
+
+        this.api.register<Promise<User>>({
+            "route": defaultURL,
+            "type": "action",
+            "callback": ({ request, params }) => {
+                return this.auth(request, params["p"]);
+            }
+        });
+
+        this.api.register<Promise<User>>({
+            "route": callbackURL,
+            "type": "loader",
+            "callback": ({ request, params }) => {
+                return this.auth(request, params["p"]);
+            }
+        });
+
         this.authenticator.use(new strategy({
             ...options,
-            "callbackURL": this.api.format("auth", provider, "callback")
-        }, verify));
+            callbackURL
+        }, user => {
+            return verify?.(user);
+        }));
+
+        return {
+            "route": {
+                "default": defaultURL,
+                "callback": callbackURL
+            }
+        };
     }
 
     /**
