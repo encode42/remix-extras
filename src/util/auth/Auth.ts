@@ -3,7 +3,7 @@ import { redirect, Request, SessionStorage } from "@remix-run/node";
 import { storageBuilder, storageBuilderProps } from "./storageBuilder";
 import { authBuilder } from "./authBuilder";
 import { API } from "../api";
-import { Class } from "@encode42/mantine-extras";
+import { arrayify, Class } from "@encode42/mantine-extras";
 import { Strategy } from "remix-auth/build/strategy";
 
 /**
@@ -16,6 +16,10 @@ export interface AuthProps extends storageBuilderProps {
     api: API
 }
 
+export interface fromProps<User> extends AuthProps {
+    "providers": registerProps<unknown, User>[]
+}
+
 /**
  * Options for the {@link Auth.getAccount} function.
  */
@@ -26,19 +30,58 @@ export interface getAccountOptions {
     "failureRedirect"?: boolean
 }
 
-/**
- * Options for the {@link Auth.register} function.
- */
-export interface registerProps<T, User> {
+export interface Route {
     /**
-     * Class to authenticate with.
+     * Default provider route.
      */
-    "strategy": Class<T>,
+    "default": string,
+
+    /**
+     * Provider callback route.
+     */
+    "callback": string,
+
+    /**
+     * Full provider callback route including site name.
+     */
+    "fullCallback": string
+}
+
+/**
+ * Shared properties for {@link RegisteredProvider} and {@link registerProps}.
+ */
+export interface SharedProvider {
+    /**
+     * Name of the provider.
+     *
+     * Defaults to {@code provider}'s value.
+     */
+    "name"?: string,
 
     /**
      * Provider this strategy uses.
      */
-    "provider": string,
+    "provider": string
+}
+
+/**
+ * A registered provider.
+ */
+export interface RegisteredProvider extends SharedProvider {
+    /**
+     * The {@link Route} of the provider.
+     */
+    "route": Route
+}
+
+/**
+ * Options for the {@link Auth.register} function.
+ */
+export interface registerProps<T, User> extends SharedProvider {
+    /**
+     * Class to authenticate with.
+     */
+    "strategy": Class<T>,
 
     /**
      * Function used to verify the authenticated account.
@@ -60,28 +103,29 @@ export interface registerResult {
     /**
      * Resulting routes.
      */
-    "route": {
-        /**
-         * Default provider route.
-         */
-        "default": string,
-
-        /**
-         * Provider callback route.
-         */
-        "callback": string,
-
-        /**
-         * Full provider callback route including site name.
-         */
-        "fullCallback": string
-    }
+    "route": Route
 }
 
 /**
  * A class to handle user authentication.
  */
 export class Auth<User = unknown> {
+    /**
+     * Create an {@link Auth} instance from an array of {@link registerProps providers}.
+     */
+    public static from<User>({ secret, api, providers }: fromProps<User>) {
+        const auth = new Auth({
+            secret,
+            api
+        });
+
+        for (const provider of arrayify(providers)) {
+            auth.register(provider);
+        }
+
+        return auth;
+    }
+
     /**
      * {@link https://github.com/sergiodxa/remix-auth#usage= Authenticator} instance to utilize.
      */
@@ -103,6 +147,13 @@ export class Auth<User = unknown> {
      * The route used to log a user out.
      */
     public logoutRoute: string;
+
+    /**
+     * An array of providers registered to this instance.
+     *
+     * @see register
+     */
+    public readonly registeredProviders: RegisteredProvider[] = [];
 
     constructor({ secret, api }: AuthProps) {
         this.sessionStorage = storageBuilder({
@@ -147,7 +198,7 @@ export class Auth<User = unknown> {
      * Automatically handles provider and callback routes!
      * This relies on a proper {@link API} splat setup.
      */
-    public register<T extends Strategy<User, never>>({ strategy, verify, provider, options }: registerProps<T, User>): registerResult {
+    public register<T extends Strategy<User, never>>({ strategy, verify, provider, name, options }: registerProps<T, User>): registerResult {
         const defaultURL = this.api.format(false, "auth", "provider", provider);
         const callbackURL = this.api.format(false, "auth", "callback", provider);
 
@@ -195,12 +246,21 @@ export class Auth<User = unknown> {
             return await verify?.(user);
         }));
 
+        // Add to the stored providers
+        const route = {
+            "default": defaultURL,
+            "callback": callbackURL,
+            "fullCallback": fullCallback
+        };
+
+        this.registeredProviders.push({
+            name,
+            provider,
+            route
+        });
+
         return {
-            "route": {
-                "default": defaultURL,
-                "callback": callbackURL,
-                "fullCallback": fullCallback
-            }
+            route
         };
     }
 
