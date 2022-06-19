@@ -5,6 +5,11 @@ import { createCookieSessionStorage } from "@remix-run/node";
  */
 export interface storageBuilderProps {
     /**
+     * Name of the session storage.
+     */
+    "name"?: string;
+
+    /**
      * Secret for the stored cookies.
      *
      * Defaults to the {@code COOKIE_AUTH_SECRET} environment variable.
@@ -15,18 +20,14 @@ export interface storageBuilderProps {
 /**
  * Function to build a {@link https://remix.run/docs/en/v1/api/remix#sessions SessionStorage} object.
  */
-export function storageBuilder({ secret = process.env.COOKIE_AUTH_SECRET }: storageBuilderProps) {
-    if (!secret) {
-        throw new Error("The secrets argument or COOKIE_AUTH_SECRET environment variable must not be empty.");
-    }
-
+export function storageBuilder({ name = "_session", secret = process.env.COOKIE_AUTH_SECRET }: storageBuilderProps) {
     return createCookieSessionStorage({
         "cookie": {
-            "name": "_session",
+            "name": name,
             "sameSite": "lax",
             "path": "/",
             "httpOnly": true,
-            "secrets": [secret],
+            "secrets": secret ? [secret] : undefined,
             "secure": process.env.NODE_ENV === "production"
         }
     });

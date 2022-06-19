@@ -12,7 +12,7 @@ export interface EndpointParams {
 /**
  * Callback function of endpoints.
  */
-export type EndpointCallback<T> = ({ param, request }: EndpointParams) => T;
+export type EndpointCallback<T = unknown> = ({ param, request }: EndpointParams) => T;
 
 /**
  * Types of available endpoint types.
@@ -190,19 +190,24 @@ export class API {
         this.endpointFormat = endpointFormat ?? `api/v${apiVersion}/`;
     }
 
-    getFormat(withName = false) {
-        if (withName && !this.websiteURL) {
+    /**
+     * Get the format of the API route.
+     *
+     * @param withURL Whether to include the website URL.
+     */
+    private getFormat(withURL = false) {
+        if (withURL && !this.websiteURL) {
             throw new Error("The websiteURL argument or WEBSITE_URL environment variable must not be empty.");
         }
 
-        return `${withName ? leadingSlash(this.websiteURL, false) : ""}/${this.endpointFormat}`;
+        return `${withURL ? leadingSlash(this.websiteURL, false) : ""}/${this.endpointFormat}`;
     }
 
     /**
      * Format an array of paths into an API path.
      */
-    format(withName, ...paths) {
-        return `${this.getFormat(withName)}${paths.join("/")}`;
+    format(withURL, ...paths) {
+        return `${this.getFormat(withURL)}${paths.join("/")}`;
     }
 
     /**

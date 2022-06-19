@@ -1,6 +1,6 @@
 import { SessionStorage } from "@remix-run/node";
 import { Authenticator } from "remix-auth";
-import { storageBuilder } from "./storageBuilder";
+import { storageBuilder } from "../session";
 
 /**
  * Options for the {@link authBuilder} function.
@@ -19,6 +19,6 @@ export interface authBuilderProps {
  */
 export function authBuilder<T>({ sessionStorage = storageBuilder({}) }: authBuilderProps) {
     return new Authenticator<T>(sessionStorage, {
-        "sessionKey": "_session"
+        "sessionKey": "_auth"
     });
 }

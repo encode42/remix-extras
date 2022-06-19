@@ -1,23 +1,34 @@
 import { AuthenticateOptions, Authenticator } from "remix-auth";
 import { redirect, Request, SessionStorage } from "@remix-run/node";
-import { storageBuilder, storageBuilderProps } from "./storageBuilder";
 import { authBuilder } from "./authBuilder";
 import { API } from "../api";
 import { arrayify, Class } from "@encode42/mantine-extras";
 import { Strategy } from "remix-auth/build/strategy";
+import { storageBuilder, storageBuilderProps } from "../session";
+import { APIProp } from "../interface";
 
 /**
  * Options for the {@link Auth} class.
  */
-export interface AuthProps extends storageBuilderProps {
+export interface AuthProps extends APIProp {
     /**
-     * {@link API} instance to make requests with.
+     * Secret for the stored cookies.
+     *
+     * Defaults to the {@code COOKIE_AUTH_SECRET} environment variable.
      */
-    api: API
+    "secret"?: storageBuilderProps["secret"]
 }
 
-export interface fromProps<User> extends AuthProps {
-    "providers": registerProps<unknown, User>[]
+/**
+ * Options for the {@link from} function.
+ */
+export interface fromProps extends AuthProps {
+    /**
+     * Array of providers to register.
+     *
+     * @see register
+     */
+    "providers": registerProps<unknown>[]
 }
 
 /**
@@ -77,7 +88,7 @@ export interface RegisteredProvider extends SharedProvider {
 /**
  * Options for the {@link Auth.register} function.
  */
-export interface registerProps<T, User> extends SharedProvider {
+export interface registerProps<T> extends SharedProvider {
     /**
      * Class to authenticate with.
      */
@@ -88,7 +99,7 @@ export interface registerProps<T, User> extends SharedProvider {
      *
      * @param user Resulting user.
      */
-    "verify"?: (user: User) => any,
+    "verify"?: <User = unknown>(user: User) => any,
 
     /**
      * Additional options for the provider.
@@ -107,14 +118,29 @@ export interface registerResult {
 }
 
 /**
+ * Function to get properties from a user.
+ */
+export type LoaderProcess<User> = (user: User) => {
+    /**
+     * Username of the user.
+     */
+    "username": string,
+
+    /**
+     * Profile picture URL of the user.
+     */
+    "profilePicture": string
+}
+
+/**
  * A class to handle user authentication.
  */
 export class Auth<User = unknown> {
     /**
      * Create an {@link Auth} instance from an array of {@link registerProps providers}.
      */
-    public static from<User>({ secret, api, providers }: fromProps<User>) {
-        const auth = new Auth({
+    public static from<User>({ secret, api, providers }: fromProps) {
+        const auth = new Auth<User>({
             secret,
             api
         });
@@ -146,7 +172,7 @@ export class Auth<User = unknown> {
     /**
      * The route used to log a user out.
      */
-    public logoutRoute: string;
+    public readonly logoutRoute: string;
 
     /**
      * An array of providers registered to this instance.
@@ -156,7 +182,9 @@ export class Auth<User = unknown> {
     public readonly registeredProviders: RegisteredProvider[] = [];
 
     constructor({ secret, api }: AuthProps) {
+        // Create the session storage and authenticator
         this.sessionStorage = storageBuilder({
+            "name": "_auth",
             "secret": secret
         });
 
@@ -166,6 +194,7 @@ export class Auth<User = unknown> {
 
         this.api = api;
 
+        // Register the logout route
         this.logoutRoute = this.api.format(false, "auth", "logout");
         this.api.register({
             "route": this.logoutRoute,
@@ -198,7 +227,7 @@ export class Auth<User = unknown> {
      * Automatically handles provider and callback routes!
      * This relies on a proper {@link API} splat setup.
      */
-    public register<T extends Strategy<User, never>>({ strategy, verify, provider, name, options }: registerProps<T, User>): registerResult {
+    public register<T extends Strategy<User, never>>({ strategy, verify, provider, name, options }: registerProps<T>): registerResult {
         const defaultURL = this.api.format(false, "auth", "provider", provider);
         const callbackURL = this.api.format(false, "auth", "callback", provider);
 
@@ -254,7 +283,7 @@ export class Auth<User = unknown> {
         };
 
         this.registeredProviders.push({
-            name,
+            "name": name ?? provider,
             provider,
             route
         });
@@ -280,9 +309,24 @@ export class Auth<User = unknown> {
      *
      * @param request Request to logout
      */
-    public async logout(request) {
+    public async logout(request: Request) {
         await this.authenticator.logout(request, {
             "redirectTo": "/"
         });
+    }
+
+    /**
+     * Loader function to get a user's username, profile picture, and logout route.
+     *
+     * @param request Request to load
+     * @param process {@link LoaderProcess} function to process with
+     */
+    public async loader(request: Request, process: LoaderProcess<User>) {
+        const user = await this.getAccount(request);
+
+        return user ? {
+            ...process(user),
+            "logoutRoute": this.logoutRoute
+        } : null;
     }
 }
