@@ -1,3 +1,7 @@
+# 2.1.2
+### Fixed
+- Made `AvatarMenuWrapperProps#to` optional.
+
 # 2.1.1
 ### Fixed
 - Bumped `@encode42/mantine-extras` version.

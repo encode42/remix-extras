@@ -10,8 +10,10 @@ import { AvatarMenu, AvatarMenuProps } from "./AvatarMenu";
 export interface AvatarMenuWrapperProps extends AvatarMenuProps, Optional<PropsWithChildren, "children"> {
     /**
      * Where the logout button links to.
+     *
+     * Defaults to {@code /login}.
      */
-    "to": LinkProps["to"],
+    "to"?: LinkProps["to"],
 
     /**
      * Options for the {@link Link} component.
