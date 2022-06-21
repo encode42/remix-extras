@@ -12,6 +12,6 @@ export function Anchor({to, ...other}: AnchorProps) {
     return to ? (
         <MantineAnchor to={to} component={Link} {...other} />
     ) : (
-        <MantineAnchor href={to.toString()} {...other} />
+        <MantineAnchor href={to ? to.toString() : "#"} {...other} />
     );
 }

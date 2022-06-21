@@ -1,7 +1,7 @@
 import React from "react";
+import { useNavigate } from "@remix-run/react";
 import { ErrorPage as MantineErrorPage, ErrorPageProps } from "@encode42/mantine-extras";
 import { Anchor } from "../Anchor";
-import { useNavigate } from "react-router";
 
 /**
  * A generic error page with back button.
@@ -19,7 +19,7 @@ export function ErrorPage({
                     Home
                 </Anchor>
                 <Anchor onClick={() => {
-                    navigate("..");
+                    navigate(-1);
                 }}>
                     Back
                 </Anchor>

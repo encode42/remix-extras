@@ -1,5 +1,17 @@
-# 2.0.0
+# 2.1.0
+### Fixed
+- `Anchor` without `to` will no longer throw an error.
+- `ErrorPage` throwing an error.
 
+### Added
+- The `AvatarMenu` component.
+- The `AvatarMenuWrapper` component.
+- The `Login` component.
+
+### Removed
+- The `ThemeToggle` component. Moved to `@encode42/mantine-extras`.
+
+# 2.0.0
 ### Changed
 - `API#EndpointCallback` type generic defaults to `unknown`.
 - Renamed `API#getFormat`'s `withName` argument to `withURL`.
@@ -11,8 +23,8 @@
 - `storageBuilder`'s `secret` argument is now optional.
 
 ### Added
-- `ThemeToggle` component.
-- `UserProvider` context provider.
+- The `ThemeToggle` component.
+- The `UserProvider` context provider.
 - Documentation for `API#getFormat`.
 - Documentation for `Auth#fromProps`.
 - `Auth#registerProps`'s `verify` property accepts type generic.
