@@ -19,7 +19,7 @@ export interface AvatarMenuWrapperProps extends AvatarMenuProps, Optional<PropsW
     "linkProps"?: Omit<LinkProps, "to">,
 
     /**
-     * Options for the {@link Button} component.
+     * Options for the {@link https://mantine.dev/core/button Button} component.
      */
     "buttonProps"?: ButtonProps
 }

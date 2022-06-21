@@ -11,7 +11,7 @@ import { ColorScheme } from "@mantine/core";
  */
 export interface ThemeProps extends APIProp {
     /**
-     * Default {@link ColorScheme} of the website.
+     * Default {@link https://mantine.dev/hooks/use-color-scheme ColorScheme} of the website.
      */
     "colorScheme"?: ColorScheme
 }
@@ -26,6 +26,9 @@ export interface getResult {
     "colorScheme": ColorScheme
 }
 
+/**
+ * A class to handle user theming via cookies.
+ */
 export class Theme {
     /**
      * {@link https://remix.run/docs/en/v1/api/remix#createsessionstorage SessionStorage} instance to utilize.
@@ -40,7 +43,7 @@ export class Theme {
     private readonly api: API;
 
     /**
-     * Default {@link ColorScheme} of the website.
+     * Default {@link https://mantine.dev/hooks/use-color-scheme ColorScheme} of the website.
      */
     public readonly colorScheme: ColorScheme;
 
