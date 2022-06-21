@@ -1,3 +1,7 @@
+# 2.1.1
+### Fixed
+- Bumped `@encode42/mantine-extras` version.
+
 # 2.1.0
 ### Fixed
 - `Anchor` without `to` will no longer throw an error.
