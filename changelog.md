@@ -1,3 +1,12 @@
+# 2.2.0
+### Added
+- The `LoginWrapper` component.
+- The `Login#brandIcons` variable.
+
+### Removed
+- The `AvatarMenu` component.
+- The `AvatarMenuWrapper` component.
+
 # 2.1.2
 ### Fixed
 - Made `AvatarMenuWrapperProps#to` optional.

@@ -32,7 +32,7 @@ interface BrandIcons {
 /**
  * Object of available brand icons.
  */
-const brandIcons: BrandIcons = {
+export const brandIcons: BrandIcons = {
     "discord": <IconBrandDiscord />,
     "github": <IconBrandGithub />,
     "google": <IconBrandGoogle />,
