@@ -37,9 +37,7 @@ export function LoginWrapper({ to = "/login", linkProps, buttonProps, label = "L
     const { user } = useUser();
 
     return (
-        user ? (
-            {children}
-        ) : (
+        user ? children : (
             <Link to={to} {...linkProps}>
                 <Button {...buttonProps}>
                     {label}

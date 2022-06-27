@@ -1,3 +1,7 @@
+# 2.2.1
+### Fixed
+- Incorrect usage of children in `LoginWrapper`.
+
 # 2.2.0
 ### Added
 - The `LoginWrapper` component.
