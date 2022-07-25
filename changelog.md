@@ -1,3 +1,7 @@
+# 3.0.1
+### Changed
+- No longer depends on packages provided by mantine-extras.
+
 # 3.0.0
 ### Changed
 - Updated to mantine-extras 4.0.0.
