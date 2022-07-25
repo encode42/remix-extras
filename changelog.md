@@ -1,3 +1,7 @@
+# 3.0.0
+### Changed
+- Updated to mantine-extras 4.0.0.
+
 # 2.2.1
 ### Fixed
 - Incorrect usage of children in `LoginWrapper`.

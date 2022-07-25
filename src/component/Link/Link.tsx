@@ -10,7 +10,7 @@ export interface LinkProps extends RemixLinkProps {
     /**
      * Mantine UI's component styling API.
      */
-    "sx"?: AnchorProps<"a">["sx"]
+    "sx"?: AnchorProps["sx"]
 }
 
 /**
