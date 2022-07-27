@@ -4,19 +4,19 @@ import { authBuilder } from "./authBuilder";
 import { API } from "../api";
 import { arrayify, Class } from "@encode42/mantine-extras";
 import { Strategy } from "remix-auth/build/strategy";
-import { storageBuilder, storageBuilderProps } from "../session";
 import { APIProp } from "../interface";
+import { storageBuilder } from "../session";
 
 /**
  * Options for the {@link Auth} class.
  */
 export interface AuthProps extends APIProp {
     /**
-     * Secret for the stored cookies.
+     * {@link https://remix.run/docs/en/v1/api/remix#sessions SessionStorage} instance to utilize.
      *
-     * Defaults to the {@code COOKIE_AUTH_SECRET} environment variable.
+     * @see storageBuilder
      */
-    "secret"?: storageBuilderProps["secret"]
+    "storage"?: SessionStorage
 }
 
 /**
@@ -139,9 +139,9 @@ export class Auth<User = unknown> {
     /**
      * Create an {@link Auth} instance from an array of {@link registerProps providers}.
      */
-    public static from<User>({ secret, api, providers }: fromProps) {
+    public static from<User>({ storage, api, providers }: fromProps) {
         const auth = new Auth<User>({
-            secret,
+            storage,
             api
         });
 
@@ -162,7 +162,7 @@ export class Auth<User = unknown> {
      *
      * @see storageBuilder
      */
-    private readonly sessionStorage: SessionStorage;
+    private readonly storage: SessionStorage;
 
     /**
      * {@link API} instance to utilize.
@@ -181,18 +181,18 @@ export class Auth<User = unknown> {
      */
     public readonly registeredProviders: RegisteredProvider[] = [];
 
-    constructor({ secret, api }: AuthProps) {
-        // Create the session storage and authenticator
-        this.sessionStorage = storageBuilder({
-            "name": "_auth",
-            "secret": secret
-        });
-
-        this.authenticator = authBuilder<User>({
-            "sessionStorage": this.sessionStorage
-        });
-
+    constructor({ storage, api }: AuthProps) {
         this.api = api;
+
+        // Create the session storage if not provided
+        this.storage = storage ?? storageBuilder.cookie({
+            "name": "_auth"
+        });
+
+        // Create the authenticator
+        this.authenticator = authBuilder<User>({
+            "storage": this.storage
+        });
 
         // Register the logout route
         this.logoutRoute = this.api.format(false, "auth", "logout");

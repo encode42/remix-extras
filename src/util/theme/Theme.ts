@@ -1,10 +1,10 @@
 import { APIProp, RouteRequest } from "../interface";
 import { API } from "../api";
 import { json, Request, SessionStorage } from "@remix-run/node";
-import { storageBuilder } from "../session";
 import { getFormData } from "remix-params-helper";
 import { SetTheme } from "../../validation";
 import { ColorScheme } from "@mantine/core";
+import { storageBuilder } from "../session";
 
 /**
  * Options for the {@link Theme} class.
@@ -13,7 +13,14 @@ export interface ThemeProps extends APIProp {
     /**
      * Default {@link https://mantine.dev/hooks/use-color-scheme ColorScheme} of the website.
      */
-    "colorScheme"?: ColorScheme
+    "colorScheme"?: ColorScheme,
+
+    /**
+     * {@link https://remix.run/docs/en/v1/api/remix#sessions SessionStorage} instance to utilize.
+     *
+     * @see storageBuilder
+     */
+    "storage"?: SessionStorage
 }
 
 /**
@@ -31,11 +38,11 @@ export interface getResult {
  */
 export class Theme {
     /**
-     * {@link https://remix.run/docs/en/v1/api/remix#createsessionstorage SessionStorage} instance to utilize.
+     * {@link https://remix.run/docs/en/v1/api/remix#sessions SessionStorage} instance to utilize.
      *
      * @see storageBuilder
      */
-    private readonly sessionStorage: SessionStorage;
+    private readonly storage: SessionStorage;
 
     /**
      * {@link API} instance to utilize.
@@ -52,13 +59,14 @@ export class Theme {
      */
     public readonly setRoute: string;
 
-    constructor({ api, colorScheme = "dark" }: ThemeProps) {
-        this.sessionStorage = storageBuilder({
-            "name": "_theme"
-        });
-
+    constructor({ storage, api, colorScheme = "dark" }: ThemeProps) {
         this.api = api;
         this.colorScheme = colorScheme;
+
+        // Create the session storage if not provided
+        this.storage = storage ?? storageBuilder.cookie({
+            "name": "_theme"
+        });
 
         // Register the set route
         this.setRoute = this.api.format(false, "theme", "set");
@@ -82,7 +90,7 @@ export class Theme {
                 // Reply with the cookie header
                 return json(null, {
                     "headers": {
-                        "Set-Cookie": await this.sessionStorage.commitSession(cookie)
+                        "Set-Cookie": await this.storage.commitSession(cookie)
                     }
                 });
             }
@@ -95,7 +103,7 @@ export class Theme {
      * @param request Request to get cookie from.
      */
     private async getCookie(request: Request) {
-        return await this.sessionStorage.getSession(request.headers.get("Cookie"));
+        return await this.storage.getSession(request.headers.get("Cookie"));
     }
 
     /**
