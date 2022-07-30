@@ -5,6 +5,9 @@ import { getFormData } from "remix-params-helper";
 import { SetTheme } from "../../validation";
 import { ColorScheme } from "@mantine/core";
 import { storageBuilder } from "../session";
+import { z } from "zod";
+
+type onGet = (request: Request, current: ColorScheme) => Promise<ColorScheme>;
 
 /**
  * Options for the {@link Theme} class.
@@ -21,6 +24,10 @@ export interface ThemeProps extends APIProp {
      * @see storageBuilder
      */
     "storage"?: SessionStorage
+
+    "onChange"?: (request: Request, data: z.infer<typeof SetTheme>) => Promise<void>
+
+    "onGet"?: onGet;
 }
 
 /**
@@ -49,6 +56,8 @@ export class Theme {
      */
     private readonly api: API;
 
+    private readonly onGet: onGet;
+
     /**
      * Default {@link https://mantine.dev/hooks/use-color-scheme ColorScheme} of the website.
      */
@@ -59,8 +68,9 @@ export class Theme {
      */
     public readonly setRoute: string;
 
-    constructor({ storage, api, colorScheme = "dark" }: ThemeProps) {
+    constructor({ storage, api, colorScheme = "dark", onChange, onGet }: ThemeProps) {
         this.api = api;
+        this.onGet = onGet;
         this.colorScheme = colorScheme;
 
         // Create the session storage if not provided
@@ -82,6 +92,8 @@ export class Theme {
                         "status": 400
                     });
                 }
+
+                await onChange?.(request, formValidation.data);
 
                 // Set the colorScheme variable
                 const cookie = await this.getCookie(request);
@@ -113,9 +125,14 @@ export class Theme {
      */
     public async get(request: Request): Promise<getResult> {
         const cookie = await this.getCookie(request);
+        let current = cookie.get("colorScheme") ?? this.colorScheme;
+
+        if (this.onGet) {
+            current = await this.onGet(request, current);
+        }
 
         return {
-            "colorScheme": cookie.get("colorScheme") ?? this.colorScheme
+            "colorScheme": current
         };
     }
 }

@@ -1,11 +1,12 @@
 import { AuthenticateOptions, Authenticator } from "remix-auth";
-import { redirect, Request, SessionStorage } from "@remix-run/node";
+import { Headers, HeadersInit, redirect, Request, SessionStorage } from "@remix-run/node";
 import { authBuilder } from "./authBuilder";
 import { API } from "../api";
 import { arrayify, Class } from "@encode42/mantine-extras";
 import { Strategy } from "remix-auth/build/strategy";
 import { APIProp } from "../interface";
 import { storageBuilder } from "../session";
+import deepmerge from "deepmerge";
 
 /**
  * Options for the {@link Auth} class.
@@ -31,14 +32,25 @@ export interface fromProps extends AuthProps {
     "providers": registerProps<unknown>[]
 }
 
-/**
- * Options for the {@link Auth.getAccount} function.
- */
-export interface getAccountOptions {
+export interface logoutOptions {
     /**
-     * Whether to redirect the user on authentication failure.
+     * Path to redirect to once logged out.
+     *
+     * Defaults to {@code /}.
      */
-    "failureRedirect"?: boolean
+    "redirectTo"?: string
+
+    /**
+     * Whether to throw a redirect function once complete, or return the redirect structure.
+     *
+     * Defaults to {@code true}.
+     */
+    "throw"?: boolean,
+
+    /**
+     * Headers to inject into the logout headers.
+     */
+    "headers"?: HeadersInit
 }
 
 export interface Route {
@@ -132,6 +144,10 @@ export type LoaderProcess<User> = (user: User) => {
     "profilePicture": string
 }
 
+export interface Context {
+    "request": Request
+}
+
 /**
  * A class to handle user authentication.
  */
@@ -158,16 +174,16 @@ export class Auth<User = unknown> {
     private readonly authenticator: Authenticator<User>;
 
     /**
+     * {@link API} instance to utilize.
+     */
+    private readonly api: API;
+
+    /**
      * {@link https://remix.run/docs/en/v1/api/remix#createsessionstorage SessionStorage} instance to utilize.
      *
      * @see storageBuilder
      */
-    private readonly storage: SessionStorage;
-
-    /**
-     * {@link API} instance to utilize.
-     */
-    private readonly api: API;
+    public readonly storage: SessionStorage;
 
     /**
      * The route used to log a user out.
@@ -258,7 +274,10 @@ export class Auth<User = unknown> {
             "callback": ({ request, param }) => {
                 return this.auth(request, param, {
                     "successRedirect": "/",
-                    "failureRedirect": "/login"
+                    "failureRedirect": "/login",
+                    "context": {
+                        request
+                    } as Context
                 });
             }
         });
@@ -293,6 +312,19 @@ export class Auth<User = unknown> {
         };
     }
 
+    public getProvider(name: string) {
+        let found: RegisteredProvider;
+
+        for (const provider of this.registeredProviders) {
+            if (provider.provider === name || provider.name === name) {
+                found = provider;
+                break;
+            }
+        }
+
+        return found;
+    }
+
     /**
      * Authenticate a request with a provider.
      *
@@ -309,10 +341,29 @@ export class Auth<User = unknown> {
      *
      * @param request Request to logout
      */
-    public async logout(request: Request) {
-        await this.authenticator.logout(request, {
-            "redirectTo": "/"
-        });
+    public async logout(request: Request, options: logoutOptions = {}) {
+        options = deepmerge({
+            "redirectTo": "/",
+            "throw": true
+        } as logoutOptions, options);
+
+        const session = await this.storage.getSession(request.headers.get("Cookie"));
+
+        const headers = new Headers(options.headers);
+        headers.append("Set-Cookie", await this.storage.destroySession(session));
+
+        const structure = {
+            "url": options.redirectTo,
+            "init": {
+                headers
+            }
+        };
+
+        if (options.throw) {
+            throw redirect(structure.url, structure.init);
+        } else {
+            return structure;
+        }
     }
 
     /**
