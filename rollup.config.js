@@ -75,10 +75,7 @@ function getConfig(...types) {
         "plugins": [
             dts()
         ],
-        "external": [
-            "react",
-            "@remix-run/server-runtime/sessions"
-        ]
+        "external": ["react"]
     }];
 
     // Generate config for each type

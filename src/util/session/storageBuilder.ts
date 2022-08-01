@@ -1,5 +1,4 @@
-import { createCookieSessionStorage, createSessionStorage } from "@remix-run/node";
-import { SessionData, SessionIdStorageStrategy } from "@remix-run/server-runtime/sessions";
+import { createCookieSessionStorage, createSessionStorage, SessionData, SessionIdStorageStrategy } from "@remix-run/node";
 
 /**
  * Represents a method used to create entries in the database.

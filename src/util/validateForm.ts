@@ -1,5 +1,20 @@
-import { ZodType } from "zod";
+import { json } from "@remix-run/node";
+import deepmerge from "deepmerge";
 import { safeJSON } from "./safeJSON";
+import { ZodType } from "zod";
+
+
+/**
+ * Options for the {@link validateForm} function.
+ */
+export interface validateFormOptions {
+    /**
+     * Whether to throw a json response stating the errors.
+     *
+     * @defaultValue false
+     */
+    "throw"?: boolean
+}
 
 /**
  * Validate a request's [FormData](https://developer.mozilla.org/en-US/docs/Web/API/FormData) with a [Zod](https://github.com/colinhacks/zod) schema.
@@ -9,6 +24,7 @@ import { safeJSON } from "./safeJSON";
  *
  * @param request Request to validate
  * @param schema  [Zod](https://github.com/colinhacks/zod) schema to validate with
+ * @param options Validation options
  * @return Either the validated [FormData](https://developer.mozilla.org/en-US/docs/Web/API/FormData) or empty object
  * @example
  * > `/app/routes/index.tsx`
@@ -55,9 +71,22 @@ import { safeJSON } from "./safeJSON";
  * }
  * ```
  */
-export async function validateForm<T extends ZodType>(request: Request, schema: T) {
-    const formData = await request.formData();
-    const data = formData.get("data") ?? "";
+export async function validateForm<T extends ZodType>(request: Request, schema: T, options?: validateFormOptions) {
+    options = deepmerge({
+        "throw": false
+    } as validateFormOptions, options);
 
-    return schema.safeParse(safeJSON<T>(data));
+    const formData = await request.formData();
+    const parsed = schema.safeParse(safeJSON<T>(formData.get("data")));
+
+    if (options.throw && !parsed.success) {
+        throw json({
+            // @ts-ignore
+            "error": parsed.error
+        }, {
+            "status": 400
+        });
+    }
+
+    return parsed;
 }

@@ -1,3 +1,8 @@
+# 4.1.0
+### Added
+- The `options` argument to `validateForm`.
+- The `validateFormOptions` interface.
+
 # 4.0.1
 ### Changed
 - Updated all dependencies.
