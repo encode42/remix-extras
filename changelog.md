@@ -1,3 +1,7 @@
+# 4.0.1
+### Changed
+- Updated all dependencies.
+
 # 4.0.0
 ### Added
 - The `AuthProps#storage` option.
