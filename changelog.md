@@ -1,3 +1,45 @@
+# 4.0.0
+### Added
+- The `AuthProps#storage` option.
+  - Affects the `Auth` constructor.
+- The `logoutOptions` interface.
+- The `Context` interface.
+  - The `action` of a registered provider now includes a `context` object.
+- The `Auth#getProvider` method.
+- The `options` argument to `Auth#logout`.
+- The `safeJSON` function.
+- The `storageBuilder.database` function.
+- The `ThemeProps#storage` option.
+- The `ThemeProps#onChange` option.
+  - Called when a request's theme is set.
+- The `ThemeProps#onGet` option.
+  - Called when a request's theme is requested.
+- The `validateForm` function.
+- The `variableName` function.
+- The `DisplayName` Zod object.
+- The `Status` Zod object.
+- The `Bio` Zod object.
+
+### Changed
+- Improved documentation.
+- The `BrandIcons` interface is now exported.
+- The `userUser` context generic no longer extends `GenericUser`.
+- Renamed the `Auth#sessionStorage` field to `Auth#storage`.
+- `Auth#logout` is now manually handled, rather than handled by `remix-auth`.
+  - Renamed the `sessionStorage` argument to `storage` in `authBuilder`.
+- `storageBuilder` is now an object that holds two functions.
+  - `cookie` will build a cookie-based session.
+  - `database` will build a database-based session.
+- Renamed the `Theme#sessionStorage` field to `Theme#storage`.
+
+### Removed
+- The `AuthProps#secret` option.
+  - Affects the `Auth` constructor.
+- The `getAccountOptions` interface.
+- The `Action` interface.
+- The `Response` interface.
+- The `GenericUser` interface.
+
 # 3.0.1
 ### Changed
 - No longer depends on packages provided by mantine-extras.

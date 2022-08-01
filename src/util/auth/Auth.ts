@@ -144,7 +144,13 @@ export type LoaderProcess<User> = (user: User) => {
     "profilePicture": string
 }
 
+/**
+ * Context object provided by a registered provider's `action`.
+ */
 export interface Context {
+    /**
+     * Request for the action.
+     */
     "request": Request
 }
 
@@ -183,7 +189,7 @@ export class Auth<User = unknown> {
      *
      * @see storageBuilder
      */
-    public readonly storage: SessionStorage;
+    private readonly storage: SessionStorage;
 
     /**
      * The route used to log a user out.
