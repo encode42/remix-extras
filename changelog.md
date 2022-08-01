@@ -1,3 +1,7 @@
+# 4.1.1
+### Added
+- The `validateFormOptions#fullReturn` option.
+
 # 4.1.0
 ### Added
 - The `options` argument to `validateForm`.

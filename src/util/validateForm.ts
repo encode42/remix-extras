@@ -14,6 +14,13 @@ export interface validateFormOptions {
      * @defaultValue false
      */
     "throw"?: boolean
+
+    /**
+     * Whether to return the full result from Zod's validation.
+     *
+     * @defaultValue Opposite of {@link validateFormOptions.throw}
+     */
+    "fullReturn"?: boolean
 }
 
 /**
@@ -73,7 +80,8 @@ export interface validateFormOptions {
  */
 export async function validateForm<T extends ZodType>(request: Request, schema: T, options?: validateFormOptions) {
     options = deepmerge({
-        "throw": false
+        "throw": false,
+        "fullReturn": options.fullReturn ?? !(options.throw ?? false)
     } as validateFormOptions, options);
 
     const formData = await request.formData();
@@ -88,5 +96,6 @@ export async function validateForm<T extends ZodType>(request: Request, schema: 
         });
     }
 
-    return parsed;
+    // @ts-ignore
+    return options.fullReturn ? parsed : parsed.data;
 }
