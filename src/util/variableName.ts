@@ -1,3 +1,9 @@
+/**
+ * Get the name of a variable.
+ *
+ * @author https://stackoverflow.com/a/66935761/10015929
+ * @param variable Variable wrapped in a function.
+ */
 function getName(variable: () => any) {
     return variable.toString().replace(/[ ()=>|]/g,"");
 }
@@ -5,6 +11,7 @@ function getName(variable: () => any) {
 /**
  * Get the name of a variable.
  *
+ * @remarks
  * Handles the passing of arrays.
  *
  * @author https://stackoverflow.com/a/66935761/10015929

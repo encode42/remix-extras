@@ -22,7 +22,7 @@ export interface LoginProps {
 /**
  * Structure for the {@link brandIcons} object.
  */
-interface BrandIcons {
+export interface BrandIcons {
     /**
      * An available brand icon.
      */

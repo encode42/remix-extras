@@ -14,8 +14,9 @@ export interface LinkProps extends RemixLinkProps {
 }
 
 /**
- * A Remix {@link https://remix.run/docs/en/v1/api/remix#link Link} wrapped with a {@link https://mantine.dev/core/box Box}.
+ * A Remix [Link](https://remix.run/docs/en/v1/api/remix#link) wrapped with a [Box](https://mantine.dev/core/box).
  *
+ * @remarks
  * Used for components that link elsewhere within the site, but shouldn't be styled.
  */
 export function Link({ className, sx, prefetch = "intent", ...other }: LinkProps) {

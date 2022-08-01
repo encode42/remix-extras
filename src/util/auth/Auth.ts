@@ -13,7 +13,7 @@ import deepmerge from "deepmerge";
  */
 export interface AuthProps extends APIProp {
     /**
-     * {@link https://remix.run/docs/en/v1/api/remix#sessions SessionStorage} instance to utilize.
+     * [SessionStorage](https://remix.run/docs/en/v1/api/remix#sessions) instance to utilize.
      *
      * @see storageBuilder
      */
@@ -21,7 +21,7 @@ export interface AuthProps extends APIProp {
 }
 
 /**
- * Options for the {@link from} function.
+ * Options for the {@link Auth.from} function.
  */
 export interface fromProps extends AuthProps {
     /**
@@ -36,14 +36,14 @@ export interface logoutOptions {
     /**
      * Path to redirect to once logged out.
      *
-     * Defaults to {@code /}.
+     * @defaultValue /
      */
     "redirectTo"?: string
 
     /**
      * Whether to throw a redirect function once complete, or return the redirect structure.
      *
-     * Defaults to {@code true}.
+     * @defaultValue true
      */
     "throw"?: boolean,
 
@@ -77,7 +77,7 @@ export interface SharedProvider {
     /**
      * Name of the provider.
      *
-     * Defaults to {@code provider}'s value.
+     * @defaultValue {@link SharedProvider.provider}'s value.
      */
     "name"?: string,
 
@@ -169,7 +169,7 @@ export class Auth<User = unknown> {
     }
 
     /**
-     * {@link https://github.com/sergiodxa/remix-auth#usage= Authenticator} instance to utilize.
+     * [Authenticator](https://github.com/sergiodxa/remix-auth#usage) instance to utilize.
      */
     private readonly authenticator: Authenticator<User>;
 
@@ -179,7 +179,7 @@ export class Auth<User = unknown> {
     private readonly api: API;
 
     /**
-     * {@link https://remix.run/docs/en/v1/api/remix#createsessionstorage SessionStorage} instance to utilize.
+     * [SessionStorage](https://remix.run/docs/en/v1/api/remix#createsessionstorage) instance to utilize.
      *
      * @see storageBuilder
      */
@@ -240,6 +240,7 @@ export class Auth<User = unknown> {
     /**
      * Register a new OAuth2 strategy.
      *
+     * @remarks
      * Automatically handles provider and callback routes!
      * This relies on a proper {@link API} splat setup.
      */
@@ -312,6 +313,11 @@ export class Auth<User = unknown> {
         };
     }
 
+    /**
+     * Get a registered provider from its name or provider.
+     *
+     * @param name Name or provider to get
+     */
     public getProvider(name: string) {
         let found: RegisteredProvider;
 
@@ -340,6 +346,7 @@ export class Auth<User = unknown> {
      * Log a user out.
      *
      * @param request Request to logout
+     * @param options Logout options
      */
     public async logout(request: Request, options: logoutOptions = {}) {
         options = deepmerge({
@@ -347,6 +354,8 @@ export class Auth<User = unknown> {
             "throw": true
         } as logoutOptions, options);
 
+
+        // This part is mostly taken from remix-auth's logout function
         const session = await this.storage.getSession(request.headers.get("Cookie"));
 
         const headers = new Headers(options.headers);

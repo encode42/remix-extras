@@ -26,7 +26,7 @@ export interface APIProps {
     /**
      * URL of the website.
      *
-     * Defaults to {@code process.env.WEBSITE_URL}.
+     * @defaultValue process.env.WEBSITE_URL
      */
     "websiteURL"?: string,
 
@@ -38,7 +38,8 @@ export interface APIProps {
     /**
      * Format of the endpoint.
      *
-     * Uses {@code ${websiteURL}/api/v${apiVersion}/} by default.
+     * @remarks
+     * Uses `${websiteURL}/api/v${apiVersion}/` by default.
      */
     "endpointFormat"?: string
 }
@@ -101,7 +102,8 @@ export type EndpointRoutes<T> = {
 /**
  * An API convenience class.
  *
- * Routes are expected to be stored in {@code api/v${apiVersion}/} by default.
+ * @remarks
+ * Routes are expected to be stored in `api/v${apiVersion}/` by default.
  *
  * The {@link register} and {@link handle} functions require a proper splat setup.
  * @example Recommended API and splat setup
@@ -213,6 +215,7 @@ export class API {
     /**
      * Register an API route.
      *
+     * @remarks
      * This relies on a proper {@link API} splat setup.
      */
     register<T = Response>({ route, type, callback }: registerOptions<T>) {
@@ -240,6 +243,7 @@ export class API {
     /**
      * Handles an API route.
      *
+     * @remarks
      * Redirects to the website's index if not found.
      *
      * This relies on a proper {@link API} splat setup.

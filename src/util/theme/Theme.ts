@@ -7,31 +7,40 @@ import { ColorScheme } from "@mantine/core";
 import { storageBuilder } from "../session";
 import { z } from "zod";
 
-type onGet = (request: Request, current: ColorScheme) => Promise<ColorScheme>;
+/**
+ * Method to run when theme is requested.
+ */
+export type onGet = (request: Request, current: ColorScheme) => Promise<ColorScheme>;
 
 /**
  * Options for the {@link Theme} class.
  */
 export interface ThemeProps extends APIProp {
     /**
-     * Default {@link https://mantine.dev/hooks/use-color-scheme ColorScheme} of the website.
+     * Default [ColorScheme](https://mantine.dev/hooks/use-color-scheme) of the website.
      */
     "colorScheme"?: ColorScheme,
 
     /**
-     * {@link https://remix.run/docs/en/v1/api/remix#sessions SessionStorage} instance to utilize.
+     * [SessionStorage](https://remix.run/docs/en/v1/api/remix#sessions) instance to utilize.
      *
      * @see storageBuilder
      */
     "storage"?: SessionStorage
 
+    /**
+     * Method to run when theme is set.
+     */
     "onChange"?: (request: Request, data: z.infer<typeof SetTheme>) => Promise<void>
 
+    /**
+     * Method to run when theme is requested.
+     */
     "onGet"?: onGet;
 }
 
 /**
- * Result of the {@link get} function.
+ * Result of the {@link Theme.get} function.
  */
 export interface getResult {
     /**
@@ -45,7 +54,7 @@ export interface getResult {
  */
 export class Theme {
     /**
-     * {@link https://remix.run/docs/en/v1/api/remix#sessions SessionStorage} instance to utilize.
+     * [SessionStorage](https://remix.run/docs/en/v1/api/remix#sessions) instance to utilize.
      *
      * @see storageBuilder
      */
@@ -56,10 +65,13 @@ export class Theme {
      */
     private readonly api: API;
 
+    /**
+     * Method to run when theme is requested.
+     */
     private readonly onGet: onGet;
 
     /**
-     * Default {@link https://mantine.dev/hooks/use-color-scheme ColorScheme} of the website.
+     * Default [ColorScheme](https://mantine.dev/hooks/use-color-scheme) of the website.
      */
     public readonly colorScheme: ColorScheme;
 

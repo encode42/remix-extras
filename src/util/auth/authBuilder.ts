@@ -6,7 +6,7 @@ import { Authenticator } from "remix-auth";
  */
 export interface authBuilderProps {
     /**
-     * {@link https://remix.run/docs/en/v1/api/remix#sessions SessionStorage} object to authenticate with.
+     * [SessionStorage](https://remix.run/docs/en/v1/api/remix#sessions) object to authenticate with.
      *
      * @see storageBuilder
      */
@@ -14,7 +14,7 @@ export interface authBuilderProps {
 }
 
 /**
- * Function to build an {@link https://github.com/sergiodxa/remix-auth/blob/main/docs/authenticator.md Authenticator} object.
+ * Function to build an [Authenticator](https://github.com/sergiodxa/remix-auth/blob/main/docs/authenticator.md) object.
  */
 export function authBuilder<T>({ storage }: authBuilderProps) {
     return new Authenticator<T>(storage, {

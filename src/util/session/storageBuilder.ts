@@ -28,25 +28,25 @@ interface generateCookieProps {
     /**
      * Name of the session storage.
      *
-     * Defaults to {@code _session}.
+     * @defaultValue _session
      */
     "name"?: string,
 
     /**
      * Secret for the stored cookies.
      *
-     * Defaults to {@code process.env.COOKIE_AUTH_SECRET}.
+     * @defaultValue process.env.COOKIE_AUTH_SECRET
      */
     "secret"?: string
 }
 
 /**
- * Options for the {@link cookieBuilder} function.
+ * Options for the {@link storageBuilder}'s `cookie` function.
  */
 export interface cookieBuilderProps extends generateCookieProps {}
 
 /**
- * Options for the {@link databaseBuilder} function.
+ * Options for the {@link storageBuilder}'s `database` function.
  */
 export interface databaseBuilderProps extends generateCookieProps {
     /**
@@ -70,6 +70,9 @@ export interface databaseBuilderProps extends generateCookieProps {
     "remove": RemoveMethod
 }
 
+/**
+ * Generates a cookie object.
+ */
 function generateCookie({ name = "_session", secret = process.env.COOKIE_AUTH_SECRET }: generateCookieProps): SessionIdStorageStrategy["cookie"] {
     return {
         "name": name,
@@ -81,12 +84,18 @@ function generateCookie({ name = "_session", secret = process.env.COOKIE_AUTH_SE
     };
 }
 
+/**
+ * Build a cookie-based session storage.
+ */
 function cookieBuilder({ name, secret }: cookieBuilderProps) {
     return createCookieSessionStorage({
         "cookie": generateCookie({ name, secret })
     });
 }
 
+/**
+ * Build a database-based session storage.
+ */
 function databaseBuilder({ create, read, update, remove, name, secret }: databaseBuilderProps) {
     return createSessionStorage({
         "cookie": generateCookie({ name, secret }),
@@ -98,7 +107,7 @@ function databaseBuilder({ create, read, update, remove, name, secret }: databas
 }
 
 /**
- * Builders for a {@link https://remix.run/docs/en/v1/api/remix#sessions SessionStorage} object.
+ * Builders for a [SessionStorage](https://remix.run/docs/en/v1/api/remix#sessions) object.
  */
 export const storageBuilder = {
     /**

@@ -10,7 +10,7 @@ export interface LoginWrapperProps extends PropsWithChildren {
     /**
      * Where the logout button links to.
      *
-     * Defaults to {@code /login}.
+     * @defaultValue /login
      */
     "to"?: LinkProps["to"],
 
@@ -25,13 +25,13 @@ export interface LoginWrapperProps extends PropsWithChildren {
     "linkProps"?: Omit<LinkProps, "to">,
 
     /**
-     * Options for the {@link https://mantine.dev/core/button Button} component.
+     * Options for the [Button](https://mantine.dev/core/button) component.
      */
     "buttonProps"?: ButtonProps
 }
 
 /**
- * Wrapper for the {@link AvatarMenu} component that displays a login button when logged out.
+ * Wrapper for a component that displays a login button when logged out.
  */
 export function LoginWrapper({ to = "/login", linkProps, buttonProps, label = "Login", children }: LoginWrapperProps) {
     const { user } = useUser();
