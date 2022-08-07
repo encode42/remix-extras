@@ -1,3 +1,10 @@
+# 4.2.0
+### Changed
+- The color of `Anchor`s now defaults to `primary`.
+
+### Added
+- The `external` property to `Anchor`.
+
 # 4.1.1
 ### Added
 - The `validateFormOptions#fullReturn` option.
