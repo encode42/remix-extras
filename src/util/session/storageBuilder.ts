@@ -1,4 +1,5 @@
 import { createCookieSessionStorage, createSessionStorage, SessionData, SessionIdStorageStrategy } from "@remix-run/node";
+import { getEnv } from "../getEnv";
 
 /**
  * Represents a method used to create entries in the database.
@@ -72,7 +73,11 @@ export interface databaseBuilderProps extends generateCookieProps {
 /**
  * Generates a cookie object.
  */
-function generateCookie({ name = "_session", secret = process.env.COOKIE_AUTH_SECRET }: generateCookieProps): SessionIdStorageStrategy["cookie"] {
+function generateCookie({ name = "_session", secret = getEnv("COOKIE_AUTH_SECRET") }: generateCookieProps): SessionIdStorageStrategy["cookie"] {
+    if (!secret) {
+        throw new Error("'secret' must not be undefined.");
+    }
+
     return {
         "name": name,
         "sameSite": "lax",

@@ -1,3 +1,10 @@
+# 4.1.2
+### Changed
+- Re-routed all `process.env` object accesses to `getEnv`.
+
+### Added
+- The `getEnv` function.
+
 # 4.1.1
 ### Added
 - The `validateFormOptions#fullReturn` option.
