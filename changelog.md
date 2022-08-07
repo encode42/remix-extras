@@ -1,3 +1,7 @@
+# 4.2.1
+### Changed
+- `Anchor` now falls back to a regular Mantine `Anchor` if an external link is detected.
+
 # 4.1.3
 ### Removed
 - The `getEnv` function.
@@ -6,13 +10,6 @@
 - All `process.env` argument defaults have been removed.
   - This is due to an issue with dotenv packing with the client.
   - This affects `Auth`, `Theme`, and `storageBuilder`.
-
-# 4.1.2
-### Changed
-- Re-routed all `process.env` object accesses to `getEnv`.
-
-### Added
-- The `getEnv` function.
 
 # 4.1.1
 ### Added
