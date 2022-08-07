@@ -3,7 +3,6 @@ export * from "./auth";
 export * from "./interface";
 export * from "./session";
 export * from "./theme";
-export * from "./getEnv";
 export * from "./leadingSlash";
 export * from "./safeJSON";
 export * from "./validateForm";

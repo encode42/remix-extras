@@ -1,3 +1,12 @@
+# 4.1.3
+### Removed
+- The `getEnv` function.
+
+### Changed
+- All `process.env` argument defaults have been removed.
+  - This is due to an issue with dotenv packing with the client.
+  - This affects `Auth`, `Theme`, and `storageBuilder`.
+
 # 4.1.2
 ### Changed
 - Re-routed all `process.env` object accesses to `getEnv`.

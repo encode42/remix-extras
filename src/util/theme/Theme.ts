@@ -26,7 +26,7 @@ export interface ThemeProps extends APIProp {
      *
      * @see storageBuilder
      */
-    "storage"?: SessionStorage
+    "storage": SessionStorage
 
     /**
      * Method to run when theme is set.
@@ -84,11 +84,7 @@ export class Theme {
         this.api = api;
         this.onGet = onGet;
         this.colorScheme = colorScheme;
-
-        // Create the session storage if not provided
-        this.storage = storage ?? storageBuilder.cookie({
-            "name": "_theme"
-        });
+        this.storage = storage;
 
         // Register the set route
         this.setRoute = this.api.format(false, "theme", "set");

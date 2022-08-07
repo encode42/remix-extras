@@ -207,9 +207,7 @@ export class Auth<User = unknown> {
         this.api = api;
 
         // Create the session storage if not provided
-        this.storage = storage ?? storageBuilder.cookie({
-            "name": "_auth"
-        });
+        this.storage = storage;
 
         // Create the authenticator
         this.authenticator = authBuilder<User>({

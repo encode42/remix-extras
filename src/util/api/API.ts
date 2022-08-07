@@ -1,6 +1,5 @@
 import { redirect, Request, Response } from "@remix-run/node";
 import { leadingSlash } from "../leadingSlash";
-import { getEnv } from "../getEnv";
 
 /**
  * Parameters for the {@link EndpointCallback} function arguments.
@@ -26,10 +25,8 @@ export type EndpointType = "action" | "loader" | "default";
 export interface APIProps {
     /**
      * URL of the website.
-     *
-     * @defaultValue process.env.WEBSITE_URL
      */
-    "websiteURL"?: string,
+    "websiteURL": string,
 
     /**
      * Version of the API to use.
@@ -186,7 +183,7 @@ export class API {
      */
     private readonly endpoints = new Map<string, EndpointRoutes<unknown>>;
 
-    constructor({ websiteURL = getEnv("WEBSITE_URL"), apiVersion = 1, endpointFormat }: APIProps) {
+    constructor({ websiteURL, apiVersion = 1, endpointFormat }: APIProps) {
         this.websiteURL = websiteURL;
         this.apiVersion = apiVersion;
 
