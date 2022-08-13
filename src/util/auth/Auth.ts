@@ -1,11 +1,10 @@
 import { AuthenticateOptions, Authenticator } from "remix-auth";
-import { Headers, HeadersInit, redirect, Request, SessionStorage } from "@remix-run/node";
+import { AppLoadContext, Headers, HeadersInit, redirect, Request, SessionStorage } from "@remix-run/node";
 import { authBuilder } from "./authBuilder";
 import { API } from "../api";
 import { arrayify, Class } from "@encode42/mantine-extras";
 import { Strategy } from "remix-auth/build/strategy";
 import { APIProp } from "../interface";
-import { storageBuilder } from "../session";
 import deepmerge from "deepmerge";
 
 /**
@@ -147,7 +146,7 @@ export type LoaderProcess<User> = (user: User) => {
 /**
  * Context object provided by a registered provider's `action`.
  */
-export interface Context {
+export interface Context extends AppLoadContext {
     /**
      * Request for the action.
      */

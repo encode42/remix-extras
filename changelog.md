@@ -1,3 +1,7 @@
+# 4.2.2
+### Changed
+- Updated all dependencies.
+
 # 4.2.1
 ### Changed
 - `Anchor` now falls back to a regular Mantine `Anchor` if an external link is detected.
