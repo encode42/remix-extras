@@ -1,7 +1,7 @@
 {
   "name": "@encode42/remix-extras",
   "description": "Extra components and functionality for Remix.",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "author": {
     "name": "Encode42",
     "email": "me@encode42.dev",
@@ -31,13 +31,21 @@
     "changelog.md"
   ],
   "peerDependencies": {
+    "@tabler/icons": "^1 >=1.28",
+    "@mantine/core": "^5.8",
+    "@mantine/hooks": "^5.8",
+    "@mantine/notifications": "^5.8",
+    "@mantine/prism": "^5.8",
     "@encode42/mantine-extras": "^5",
     "@remix-run/node": "^1",
     "@remix-run/react": "^1",
     "react-router": "^6",
-    "zod": "^3"
+    "zod": "^3",
+    "react": ">=17",
+    "react-dom": ">=17"
   },
   "dependencies": {
+    "@encode42/tabler-icons-types": "^1",
     "@encode42/mantine-extras": "^5",
     "@encode42/node-extras": "^1 >=1.0.1",
     "@remix-run/node": "^1 >= 1.7",
@@ -52,19 +60,12 @@
     "zod": "^3"
   },
   "devDependencies": {
-    "@encode42/tabler-icons-types": "^1.114.0",
-    "@mantine/core": "^5.8.4",
-    "@mantine/hooks": "^5.8.4",
-    "@mantine/notifications": "^5.8.4",
-    "@mantine/prism": "^5.8.4",
     "@remix-run/dev": "^1.7.6",
     "@rollup/plugin-commonjs": "^23.0.3",
     "@rollup/plugin-json": "^5.0.2",
     "@rollup/plugin-node-resolve": "^15.0.1",
-    "@tabler/icons": "^1.114.0",
     "@types/react": "^18.0.25",
     "@types/react-virtualized-auto-sizer": "^1.0.1",
-    "deepmerge": "^4.2.2",
     "esbuild": "^0.15.16",
     "eslint": "^8.28.0",
     "eslint-plugin-import": "^2.26.0",
@@ -76,8 +77,6 @@
     "eslint-plugin-sonarjs": "^0.16.0",
     "eslint-plugin-tsdoc": "^0.2.17",
     "eslint-plugin-unicorn": "^45.0.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "rollup": "^3.5.0",
     "rollup-plugin-dts": "^5.0.0",
     "rollup-plugin-esbuild": "^5.0.0",

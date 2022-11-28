@@ -1,3 +1,7 @@
+# 5.0.1
+### Changed
+- No longer includes the entirety of React, Mantine, Remix, and all that. (oops)
+
 # 5.0.0
 ### Added
 - The `IconInput` component.

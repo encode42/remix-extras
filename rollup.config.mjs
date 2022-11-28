@@ -74,8 +74,7 @@ function getConfig(...types) {
         },
         "plugins": [
             dts()
-        ],
-        "external": ["react"]
+        ]
     }];
 
     // Generate config for each type
