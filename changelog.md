@@ -1,3 +1,20 @@
+# 4.3.0
+### Added
+- The `IconInput` component.
+- The `TablerIcon` component.
+- The `validateFormThrow` function.
+
+### Changed
+- Switched tooling to `pnpm`.
+- Moved some dependencies to `peerDependencies`.
+
+### Removed
+- Moved many of the utility methods into their own package, `@encode42/node-extras`.
+  - `leadingSlash`
+  - `safeJSON`
+  - `validateForm`
+  - `variableName`
+
 # 4.2.2
 ### Changed
 - Updated all dependencies.

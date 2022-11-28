@@ -1,5 +1,5 @@
 import { redirect, Request, Response } from "@remix-run/node";
-import { leadingSlash } from "../leadingSlash";
+import { leadingSlash } from "@encode42/node-extras";
 
 /**
  * Parameters for the {@link EndpointCallback} function arguments.

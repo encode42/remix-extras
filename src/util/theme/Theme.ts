@@ -1,11 +1,11 @@
 import { APIProp, RouteRequest } from "../interface";
 import { API } from "../api";
 import { json, Request, SessionStorage } from "@remix-run/node";
-import { getFormData } from "remix-params-helper";
 import { SetTheme } from "../../validation";
 import { ColorScheme } from "@mantine/core";
 import { storageBuilder } from "../session";
 import { z } from "zod";
+import { validateFormThrow } from "../validateFormThrow";
 
 /**
  * Method to run when theme is requested.
@@ -92,20 +92,12 @@ export class Theme {
             "route": this.setRoute,
             "type": "action",
             "callback": async ({ request }: RouteRequest) => {
-                const formValidation = await getFormData(request, SetTheme);
-                if (!formValidation.data) {
-                    return json({
-                        "errors": formValidation.errors
-                    }, {
-                        "status": 400
-                    });
-                }
-
-                await onChange?.(request, formValidation.data);
+                const validation = await validateFormThrow(request, SetTheme);
+                await onChange?.(request, validation);
 
                 // Set the colorScheme variable
                 const cookie = await this.getCookie(request);
-                cookie.flash("colorScheme", formValidation.data.colorScheme);
+                cookie.flash("colorScheme", validation.colorScheme);
 
                 // Reply with the cookie header
                 return json(null, {
