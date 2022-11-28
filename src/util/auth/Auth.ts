@@ -2,7 +2,7 @@ import { AuthenticateOptions, Authenticator } from "remix-auth";
 import { AppLoadContext, Headers, HeadersInit, redirect, Request, SessionStorage } from "@remix-run/node";
 import { authBuilder } from "./authBuilder";
 import { API } from "../api";
-import { arrayify, Class } from "@encode42/mantine-extras";
+import { arrayify, ClassSpread } from "@encode42/node-extras";
 import { Strategy } from "remix-auth/build/strategy";
 import { APIProp } from "../interface";
 import deepmerge from "deepmerge";
@@ -103,7 +103,7 @@ export interface registerProps<T> extends SharedProvider {
     /**
      * Class to authenticate with.
      */
-    "strategy": Class<T>,
+    "strategy": ClassSpread<T, any>,
 
     /**
      * Function used to verify the authenticated account.

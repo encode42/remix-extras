@@ -1,12 +1,19 @@
-# 4.3.0
+# 5.0.0
 ### Added
 - The `IconInput` component.
 - The `TablerIcon` component.
 - The `validateFormThrow` function.
+- The optional `APIProps#default` field.
+- The `APIPropsDefaults` interface
+- The `API#registerIcons` function.
+- The `APIRoute` interface.
+- The `TablerIconsArray` type for use with zod.
+- The `TablerIconsEnum` zod enum.
 
 ### Changed
 - Switched tooling to `pnpm`.
 - Moved some dependencies to `peerDependencies`.
+- The `API` class will register `/api/v<X>/icon/<icon>` by default.
 
 ### Removed
 - Moved many of the utility methods into their own package, `@encode42/node-extras`.

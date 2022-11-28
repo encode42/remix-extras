@@ -1,18 +1,33 @@
 import { ActionIcon, Box, BoxProps, Group, Input, InputWrapperProps, Modal, ModalProps, Stack, Text, TextInput, Tooltip } from "@mantine/core";
 import { IconMoodSmile, IconSearch } from "@tabler/icons";
 import { TablerIconsKeys, TablerIconsTags, TablerIconsType } from "@encode42/tabler-icons-types";
-import { ReactNode, useEffect, useMemo, useState } from "react";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import { FixedSizeList } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import Fuse from "fuse.js";
 import { useDebouncedState } from "@mantine/hooks";
 import deepmerge from "deepmerge";
-import { Optional } from "@encode42/mantine-extras";
+import { Optional } from "@encode42/node-extras";
 import { TablerIcon } from "../TablerIcon";
+import { APIRoute } from "../../util";
 
-export interface IconSelectProps extends Omit<InputWrapperProps, "children"> {
+/**
+ * Options for the {@link IconInput} component.
+ */
+export interface IconSelectProps extends Omit<InputWrapperProps, "children">, APIRoute {
+    /**
+     * Number of columns to display in the modal.
+     */
     "columns"?: number,
+
+    /**
+     * Options for the [Modal](https://mantine.dev/core/modal) component.
+     */
     "modalProps"?: Optional<Omit<Omit<ModalProps, "children">, "opened">, "onClose">,
+
+    /**
+     * Options for the [Box](https://mantine.dev/core/box) component.
+     */
     "boxProps"?: BoxProps
 }
 
@@ -28,26 +43,18 @@ interface IconElement {
 // - Make picker 1:1
 // - Accessibility
 
-const icons: IconElement[] = [];
-{
-    for (const key of TablerIconsKeys) {
-        const icon = <TablerIcon type={key} />;
-        const label = key.replace("Icon", "").replace(/(\w)([A-Z])/g, "$1 $2").replace(/([a-z])(\d)/g, "$1 $2");
-
-        icons.push({
-            "value": key,
-            label,
-            icon,
-            "tags": TablerIconsTags[key].tags
-        });
-    }
-}
-
+/**
+ * An input for choosing an icon amongst [Tabler Icon](https://tabler-icons.io/)'s library of icons.
+ *
+ * @remarks
+ * Relies on a proper {@link API} splat with {@link APIPropsDefaults#icon} enabled.
+ */
 export function IconInput({
     columns = 5,
     placeholder,
     onChange,
     modalProps = {},
+    apiRoute,
     ...other
 }: IconSelectProps) {
     modalProps = deepmerge({
@@ -60,6 +67,24 @@ export function IconInput({
     const [query, setQuery] = useDebouncedState("", 350);
     const [displayedIcons, setDisplayedIcons] = useState<IconElement[]>([]);
     const [selectedIcon, setSelectedIcon] = useState<IconElement>();
+
+    const icons = useMemo(() => {
+        const iconElements: IconElement[] = [];
+
+        for (const key of TablerIconsKeys) {
+            const icon = <TablerIcon apiRoute={apiRoute} type={key} />;
+            const label = key.replace("Icon", "").replace(/(\w)([A-Z])/g, "$1 $2").replace(/([a-z])(\d)/g, "$1 $2");
+
+            iconElements.push({
+                "value": key,
+                label,
+                icon,
+                "tags": TablerIconsTags[key].tags
+            });
+        }
+
+        return iconElements;
+    }, []);
 
     const pickerGroups = useMemo<ReactNode[]>(() => {
         const groups: ReactNode[] = [];

@@ -1,5 +1,8 @@
 import { redirect, Request, Response } from "@remix-run/node";
 import { leadingSlash } from "@encode42/node-extras";
+import deepmerge from "deepmerge";
+import * as tablerIcons from "@tabler/icons";
+import fs from "fs/promises";
 
 /**
  * Parameters for the {@link EndpointCallback} function arguments.
@@ -18,6 +21,24 @@ export type EndpointCallback<T = unknown> = ({ param, request }: EndpointParams)
  * Types of available endpoint types.
  */
 export type EndpointType = "action" | "loader" | "default";
+
+/**
+ * Default routes to register and process.
+ *
+ * @see APIProps
+ */
+export interface APIPropsDefaults {
+    /**
+     * Whether to register the [Tabler Icon](https://tabler-icons.io/) fetching endpoint.
+     *
+     * @remarks
+     * Registers under `/api/v<X>/icon/<icon>`
+     *
+     * @see API#registerIcons
+     * @default true
+     */
+    "icon"?: boolean
+}
 
 /**
  * Options for the {@link API} class.
@@ -39,7 +60,20 @@ export interface APIProps {
      * @remarks
      * Uses `${websiteURL}/api/v${apiVersion}/` by default.
      */
-    "endpointFormat"?: string
+    "endpointFormat"?: string,
+
+    /**
+     * Default routes to register and process.
+     *
+     * @see APIPropsDefaults
+     * @default
+     * ```json
+     * {
+     *     "icon": true
+     * }
+     * ```
+     */
+    "defaults"?: APIPropsDefaults
 }
 
 /**
@@ -183,11 +217,19 @@ export class API {
      */
     private readonly endpoints = new Map<string, EndpointRoutes<unknown>>;
 
-    constructor({ websiteURL, apiVersion = 1, endpointFormat }: APIProps) {
+    constructor({ websiteURL, apiVersion = 1, endpointFormat, defaults = {} }: APIProps) {
+        defaults = deepmerge({
+            "icon": true
+        } as APIPropsDefaults, defaults);
+
         this.websiteURL = websiteURL;
         this.apiVersion = apiVersion;
 
         this.endpointFormat = endpointFormat ?? `api/v${apiVersion}/`;
+
+        if (defaults.icon) {
+            this.registerIcons();
+        }
     }
 
     /**
@@ -266,5 +308,33 @@ export class API {
         const param = splitURL[splitURL.length - 1].replace(/\?.+/, "");
 
         return existingType.callback({ param, request });
+    }
+
+    /**
+     * Registers all [Tabler Icons](https://tabler-icons.io/) under the `/api/v<X>/icon/<icon>` route.
+     */
+    private async registerIcons() {
+        // Register each Tabler Icon
+        for (const [key, value] of Object.entries(tablerIcons)) {
+            // TODO: Map raw icon name within TablerIconsTypes
+            // Load the icon's raw SVG
+            const name = value.toString().match(/icon-tabler-(.*?)"/);
+            const icon = await fs.readFile(`node_modules/@tabler/icons/icons/${name?.[1]}.svg`);
+
+            // Register the icon route
+            this.register({
+                "route": this.format(false, "icon", key),
+                "type": "loader",
+                "callback": () => {
+                    return new Response(icon, {
+                        "status": 200,
+                        "headers": {
+                            "Content-Type": "image/svg+xml",
+                            "Content-Disposition": `attachment; filename="${key}.svg"`
+                        }
+                    });
+                }
+            });
+        }
     }
 }
