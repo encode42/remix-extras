@@ -45,6 +45,7 @@
     "react-dom": ">=17"
   },
   "dependencies": {
+    "deepmerge": "^4",
     "@encode42/tabler-icons-types": "^1",
     "@encode42/mantine-extras": "^5",
     "@encode42/node-extras": "^1 >=1.0.1",
