@@ -1,7 +1,7 @@
 {
   "name": "@encode42/remix-extras",
   "description": "Extra components and functionality for Remix.",
-  "version": "5.0.2",
+  "version": "5.0.3",
   "author": {
     "name": "Encode42",
     "email": "me@encode42.dev",
@@ -16,41 +16,44 @@
     "url": "https://github.com/Encode42/remix-extras.git"
   },
   "license": "MIT",
-  "main": "dist/cjs.js",
-  "module": "dist/esm.js",
-  "types": "dist/index.d.ts",
+  "sideEffects": false,
+  "main": "cjs/index.js",
+  "module": "esm/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
     "build": "pnpm run build:base && pnpm run build:bundle",
     "build:base": "tsc --build",
     "build:bundle": "rollup -c rollup.config.mjs",
     "build:publish": "pnpm run build && pnpm publish",
-    "docs": "pnpm run build && pnpm exec typedoc"
+    "docs": "pnpm exec typedoc"
   },
   "files": [
-    "dist",
+    "lib",
+    "cjs",
+    "esm",
     "changelog.md"
   ],
   "peerDependencies": {
-    "@tabler/icons": "^1 >=1.28",
+    "@encode42/mantine-extras": "^5",
     "@mantine/core": "^5.8",
     "@mantine/hooks": "^5.8",
     "@mantine/notifications": "^5.8",
     "@mantine/prism": "^5.8",
-    "@encode42/mantine-extras": "^5",
     "@remix-run/node": "^1",
     "@remix-run/react": "^1",
-    "react-router": "^6",
-    "zod": "^3",
+    "@tabler/icons": "^1 >=1.28",
     "react": ">=17",
-    "react-dom": ">=17"
+    "react-dom": ">=17",
+    "react-router": "^6",
+    "zod": "^3"
   },
   "dependencies": {
-    "deepmerge": "^4",
-    "@encode42/tabler-icons-types": "^1",
     "@encode42/mantine-extras": "^5",
     "@encode42/node-extras": "^1 >=1.0.1",
+    "@encode42/tabler-icons-types": "^1",
     "@remix-run/node": "^1 >= 1.7",
     "@remix-run/react": "^1 >= 1.7",
+    "deepmerge": "^4",
     "fuse.js": "^6",
     "react-inlinesvg": "^3",
     "react-router": "^6",
@@ -79,7 +82,6 @@
     "eslint-plugin-tsdoc": "^0.2.17",
     "eslint-plugin-unicorn": "^45.0.1",
     "rollup": "^3.5.0",
-    "rollup-plugin-dts": "^5.0.0",
     "rollup-plugin-esbuild": "^5.0.0",
     "rollup-plugin-node-externals": "^5.0.2",
     "typedoc": "^0.23.21",

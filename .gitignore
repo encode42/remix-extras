@@ -1,4 +1,7 @@
 # Build files
-/dist/
-/build/
+/lib/
+/cjs/
+/esm/
 /docs/
+
+/tsconfig.tsbuildinfo

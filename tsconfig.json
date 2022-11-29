@@ -1,17 +1,23 @@
 {
     "compilerOptions": {
-        "outDir": "build",
-        "target": "ES2021",
-        "lib": ["DOM", "ES2021"],
+        "baseUrl": ".",
+        "rootDir": "src",
+        "outDir": "lib",
+        "declaration": true,
+        "declarationMap": true,
+        "declarationDir": "lib",
+        "target": "ES2020",
+        "lib": ["DOM", "ES2020"],
+        "module": "ES2020",
         "moduleResolution": "Node",
+        "jsx": "react",
         "esModuleInterop": true,
         "isolatedModules": true,
         "allowJs": true,
-        "declaration": true,
         "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true,
-        "listFiles": true,
-        "jsx": "react-jsx"
+        "composite": true,
+        "noEmitOnError": true,
+        "resolveJsonModule": true
     },
     "typedocOptions": {
         "entryPoints": ["src/index.ts"],
@@ -26,12 +32,13 @@
         "sort": ["static-first", "visibility"]
     },
     "include": [
-        "**/*.ts"
+        "./src"
     ],
     "exclude": [
-        "node_modules",
-        "build",
-        "dist",
-        "docs"
+        "./node_modules",
+        "./lib",
+        "./esm",
+        "./cjs",
+        "./docs"
     ]
 }

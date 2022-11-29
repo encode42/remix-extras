@@ -39,7 +39,6 @@ specifiers:
   remix-auth: ^3.4.0
   remix-auth-oauth2: ^1.4.0
   rollup: ^3.5.0
-  rollup-plugin-dts: ^5.0.0
   rollup-plugin-esbuild: ^5.0.0
   rollup-plugin-node-externals: ^5.0.2
   typedoc: ^0.23.21
@@ -88,7 +87,6 @@ devDependencies:
   eslint-plugin-tsdoc: 0.2.17
   eslint-plugin-unicorn: 45.0.1_eslint@8.28.0
   rollup: 3.5.0
-  rollup-plugin-dts: 5.0.0_thigodkhmbmbgju2inwjpgoskq
   rollup-plugin-esbuild: 5.0.0_kvbyivc4d272hvjoaj77mmhoxa
   rollup-plugin-node-externals: 5.0.2_rollup@3.5.0
   typedoc: 0.23.21_typescript@4.9.3
@@ -7147,20 +7145,6 @@ packages:
     hasBin: true
     dependencies:
       glob: 7.2.3
-    dev: true
-
-  /rollup-plugin-dts/5.0.0_thigodkhmbmbgju2inwjpgoskq:
-    resolution: {integrity: sha512-OO8ayCvuJCKaQSShyVTARxGurVVk4ulzbuvz+0zFd1f93vlnWFU5pBMT7HFeS6uj7MvvZLx4kUAarGATSU1+Ng==}
-    engines: {node: '>=v14'}
-    peerDependencies:
-      rollup: ^3.0.0
-      typescript: ^4.1
-    dependencies:
-      magic-string: 0.26.7
-      rollup: 3.5.0
-      typescript: 4.9.3
-    optionalDependencies:
-      '@babel/code-frame': 7.18.6
     dev: true
 
   /rollup-plugin-esbuild/5.0.0_kvbyivc4d272hvjoaj77mmhoxa:

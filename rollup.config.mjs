@@ -3,15 +3,7 @@ import nodeExternals from "rollup-plugin-node-externals";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import esbuild from "rollup-plugin-esbuild";
 import json from "@rollup/plugin-json";
-import dts from "rollup-plugin-dts";
 import path from "path";
-
-/**
- * The target output directory.
- *
- * @type {string}
- */
-const outDir = "dist";
 
 /**
  * The name of the project.
@@ -28,12 +20,18 @@ const name = "remix-extras";
  * @return {import("rollup").RollupOptions}
  */
 function getBase(type, toMinify = false) {
+    const umd = type === "umd"
+    const shouldMinify = toMinify || umd;
+
     return {
-        "input": "src/index.ts",
+        "input": "./src/index.ts",
         "output": {
-            "file": `${outDir}/${type}${toMinify ? ".min" : ""}.js`,
-            "name": type === "umd" ? name : undefined,
-            "format": type
+            name,
+            "file": umd ? "./lib/index.umd.js" : undefined,
+            "dir": umd ? undefined : type,
+            "format": type,
+            "externalLiveBindings": false,
+            "preserveModules": !umd
         },
         "plugins": [
             commonjs(),
@@ -41,16 +39,18 @@ function getBase(type, toMinify = false) {
             nodeResolve({
                 "extensions": [
                     ".ts",
-                    ".js"
+                    ".tsx",
+                    ".js",
+                    ".jsx"
                 ]
             }),
             esbuild({
-                "minify": toMinify,
+                "minify": shouldMinify,
                 "sourceMap": false,
                 "tsconfig": path.resolve(process.cwd(), "tsconfig.json")
             }),
             json({
-                "compact": toMinify
+                "compact": shouldMinify
             })
         ]
     };
@@ -66,23 +66,11 @@ function getConfig(...types) {
     /**
      * @type {import("rollup").RollupOptions[]}
      */
-    const configs = [{
-        "input": "build/index.d.ts",
-        "output": {
-            "file": `${outDir}/index.d.ts`,
-            "format": "es"
-        },
-        "plugins": [
-            dts()
-        ]
-    }];
+    const configs = [];
 
     // Generate config for each type
     for (const type of types) {
-        configs.push(
-            getBase(type),
-            getBase(type, true)
-        );
+        configs.push(getBase(type));
     }
 
     return configs;

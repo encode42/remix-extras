@@ -1,3 +1,8 @@
+# 5.0.3
+### Fixed
+- `Could not resolve "node:fs/promises"`
+  - Fixed by changing the build scripting and structure.
+
 # 5.0.2
 ### Fixed
 - `registerIcons` no longer throws an error.
