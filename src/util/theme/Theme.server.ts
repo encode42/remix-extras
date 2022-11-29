@@ -4,8 +4,8 @@ import { json, Request, SessionStorage } from "@remix-run/node";
 import { SetTheme } from "../../validation";
 import { ColorScheme } from "@mantine/core";
 import { storageBuilder } from "../session";
+import { validateFormThrow } from "../validateFormThrow.server";
 import { z } from "zod";
-import { validateFormThrow } from "../validateFormThrow";
 
 /**
  * Method to run when theme is requested.

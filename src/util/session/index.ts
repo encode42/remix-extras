@@ -1,1 +1,1 @@
-export * from "./storageBuilder";
+export * from "./storageBuilder.server";

@@ -1,7 +1,14 @@
+# 5.0.4
+### Fixed
+- *Actually* fixed `Could not resolve "node:fs/promises"`.
+- Changed how the project is built.
+
+### Changed
+- Server-side classes such as `API` are now suffixed with `.server` so they're excluded from Remix's bundles.
+
 # 5.0.3
 ### Fixed
-- `Could not resolve "node:fs/promises"`
-  - Fixed by changing the build scripting and structure.
+~~- `Could not resolve "node:fs/promises"`~~
 
 # 5.0.2
 ### Fixed

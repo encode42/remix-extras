@@ -52,6 +52,9 @@ function getBase(type, toMinify = false) {
             json({
                 "compact": shouldMinify
             })
+        ],
+        "external": [
+            "fs/promises"
         ]
     };
 }

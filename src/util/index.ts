@@ -3,4 +3,4 @@ export * from "./auth";
 export * from "./interface";
 export * from "./session";
 export * from "./theme";
-export * from "./validateFormThrow";
+export * from "./validateFormThrow.server";

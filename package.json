@@ -1,7 +1,7 @@
 {
   "name": "@encode42/remix-extras",
   "description": "Extra components and functionality for Remix.",
-  "version": "5.0.3",
+  "version": "5.0.4",
   "author": {
     "name": "Encode42",
     "email": "me@encode42.dev",
@@ -21,10 +21,11 @@
   "module": "esm/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
+    "clean": "del ./lib/** && del ./cjs/** && del ./esm/**",
     "build": "pnpm run build:base && pnpm run build:bundle",
-    "build:base": "tsc --build",
+    "build:base": "tsc --build --force",
     "build:bundle": "rollup -c rollup.config.mjs",
-    "build:publish": "pnpm run build && pnpm publish",
+    "build:publish": "pnpm run clean && pnpm run build && pnpm publish",
     "docs": "pnpm exec typedoc"
   },
   "files": [
@@ -49,7 +50,7 @@
   },
   "dependencies": {
     "@encode42/mantine-extras": "^5",
-    "@encode42/node-extras": "^1 >=1.0.1",
+    "@encode42/node-extras": "^1 >=1.0.2",
     "@encode42/tabler-icons-types": "^1",
     "@remix-run/node": "^1 >= 1.7",
     "@remix-run/react": "^1 >= 1.7",
@@ -70,6 +71,7 @@
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@types/react": "^18.0.25",
     "@types/react-virtualized-auto-sizer": "^1.0.1",
+    "del-cli": "^5.0.0",
     "esbuild": "^0.15.16",
     "eslint": "^8.28.0",
     "eslint-plugin-import": "^2.26.0",

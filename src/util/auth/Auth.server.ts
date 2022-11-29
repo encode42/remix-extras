@@ -1,6 +1,6 @@
 import { AuthenticateOptions, Authenticator } from "remix-auth";
 import { AppLoadContext, Headers, HeadersInit, redirect, Request, SessionStorage } from "@remix-run/node";
-import { authBuilder } from "./authBuilder";
+import { authBuilder } from "./authBuilder.server";
 import { API } from "../api";
 import { arrayify, ClassSpread } from "@encode42/node-extras";
 import { Strategy } from "remix-auth/build/strategy";
