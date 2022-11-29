@@ -1,5 +1,9 @@
+# 5.0.2
+### Fixed
+- `registerIcons` no longer throws an error.
+
 # 5.0.1
-### Changed
+### Fixed
 - No longer includes the entirety of React, Mantine, Remix, and all that. (oops)
 
 # 5.0.0

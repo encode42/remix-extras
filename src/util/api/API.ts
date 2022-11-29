@@ -316,6 +316,10 @@ export class API {
     private async registerIcons() {
         // Register each Tabler Icon
         for (const [key, value] of Object.entries(tablerIcons)) {
+            if (key === "default") {
+                continue;
+            }
+
             // TODO: Map raw icon name within TablerIconsTypes
             // Load the icon's raw SVG
             const name = value.toString().match(/icon-tabler-(.*?)"/);
